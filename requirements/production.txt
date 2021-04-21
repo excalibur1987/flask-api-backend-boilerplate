@@ -1,0 +1,10 @@
+flask
+gunicorn
+pandas
+sqlalchemy
+Flask-SQLAlchemy
+SQLAlchemy-Utils
+marshmallow
+flask-marshmallow
+Flask-Script
+Flask-Migrate
