@@ -5,3 +5,5 @@ black
 isort
 pytest
 sqlalchemy-stubs
+python-dotenv
+git+https://github.com/ssfdust/flask-sqlalchemy-stubs.git
