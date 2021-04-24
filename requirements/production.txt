@@ -8,3 +8,4 @@ marshmallow
 flask-marshmallow
 Flask-Script
 Flask-Migrate
+flask-restful
