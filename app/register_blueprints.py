@@ -1,5 +1,7 @@
 from flask.app import Flask
 
+from app.blueprints.users import blueprint as usr_bp
+
 
 def register_blueprints(app: Flask) -> Flask:
     """A function to register flask blueprint.
@@ -12,5 +14,7 @@ def register_blueprints(app: Flask) -> Flask:
 
     Returns:
         Flask: Flask Application instance
-    """ 
+    """
+    app.register_blueprint(usr_bp)
+
     return app

@@ -2,10 +2,10 @@ from typing import Type
 
 from flask import Flask
 
-from app.blueprints import register_blueprints
 from app.commands import register_commands
 from app.extensions import register_extensions
-from app.request_handlers import register_handlers
+from app.handlers import register_handlers
+from app.register_blueprints import register_blueprints
 from app.settings import Config
 from app.utils import chain
 
