@@ -2,6 +2,7 @@
 """Click commands."""
 import os
 from subprocess import call
+from typing import List
 
 import click
 from flask import Flask, current_app
@@ -34,9 +35,9 @@ def lint(fix_imports):
     linter(fix_imports)
 
 
-def getfiles_paths(path):
+def getfiles_paths(path: str) -> List[str]:
 
-    files = []
+    files: List[str] = []
 
     for dirpath, dirs, filenames in os.walk(path):
 
@@ -51,20 +52,29 @@ def getfiles_paths(path):
 def linter(fix_imports):
     """Lint and check code style with flake8 and isort."""
 
-    files = [f for f in getfiles_paths("./app") if f.split(".")[-1] == "py"]
-
-    def execute_tool(description, *args):
+    def execute_tool(description, *args, targets: List[str]):
         """Execute a checking tool with its arguments."""
-        command_line = list(args) + files
+        command_line = list(args)
         click.echo("{}: {}".format(description, " ".join(command_line)))
-        rv = call(command_line)
+        rv = call(command_line + targets)
         if rv != 0:
             exit(rv)
 
-    execute_tool("Formatting Files", "black")
+    execute_tool("Formatting Files", "black", targets=["."])
     if fix_imports:
-        execute_tool("Fixing import order", "isort", "-rc", "--atomic", "-m", "3")
-    execute_tool("Checking code style", "flake8")
+        execute_tool(
+            "Fixing import order", "isort", "--atomic", "-m", "3", targets=["."]
+        )
+    files = [
+        f
+        for f in (
+            getfiles_paths("./app")
+            + getfiles_paths("./migrations/versions")
+            + ["./autoapp.py"]
+        )
+        if f.split(".")[-1] == "py"
+    ]
+    execute_tool("Checking code style", "flake8", targets=files)
 
 
 @click.command()

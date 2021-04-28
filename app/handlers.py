@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING
 
 from flask.app import Flask
-from flask.globals import request
 from flask_principal import (
     Identity,
     RoleNeed,
@@ -31,7 +30,6 @@ def on_identity_loaded(sender, identity):
         # identity with the roles that the user provides
         for role in user.roles:
             identity.provides.add(RoleNeed(role.name))
-
 
 
 def user_identity_lookup(user: "User"):
@@ -71,7 +69,7 @@ def register_handlers(app: Flask) -> Flask:
     identity_loaded.connect_via(app)(on_identity_loaded)
 
     @app.errorhandler(InvalidUsage)
-    def invalid_error_handler(e:InvalidUsage):
+    def invalid_error_handler(e: InvalidUsage):
         return e.to_json()
 
     return app

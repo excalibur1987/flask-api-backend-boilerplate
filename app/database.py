@@ -1,11 +1,11 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Type, Union
+from typing import TYPE_CHECKING, Type
 
 from flask.globals import current_app
 from flask_jwt_extended import current_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy.model import Model
-from sqlalchemy import Column, MetaData, and_, text
+from sqlalchemy import Column, and_, text
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.mutable import Mutable
@@ -16,11 +16,11 @@ from app.exceptions import InvalidUsage
 
 metadata = MetaData(
     naming_convention={
-    "ix": 'ix_%(column_0_label)s',
-    "uq": "uq_%(table_name)s_%(column_0_name)s",
-    "ck": "ck_%(table_name)s_%(constraint_name)s",
-    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-    "pk": "pk_%(table_name)s"
+        "ix": "ix_%(column_0_label)s",
+        "uq": "uq_%(table_name)s_%(column_0_name)s",
+        "ck": "ck_%(table_name)s_%(constraint_name)s",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s",
     }
 )
 
@@ -75,7 +75,6 @@ class DatedModel(object):
         return Column(String, ForeignKey("user.id"))
 
     def __init__(self, **kwargs) -> None:
-        from flask import session
 
         if not current_user and not kwargs.get("added_by", None):
             raise InvalidUsage.user_not_found()
