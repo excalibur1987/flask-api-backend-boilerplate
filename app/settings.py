@@ -2,8 +2,16 @@ import os
 import random
 import string
 from datetime import timedelta
+from typing import TypedDict
 
+import pytz
+from flask_principal import Permission, RoleNeed
 from sqlalchemy.pool import NullPool
+
+
+class RolesDict(TypedDict):
+    user: Permission
+    manager: Permission
 
 
 class Config(object):
@@ -13,7 +21,7 @@ class Config(object):
     SESSION_TYPE = "filesystem"
     SESSION_COOKIE_SECURE = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
-    TZ = os.getenv("TZ", "UTC")
+    TZ = pytz.timezone(os.getenv("TZ", "UTC"))
     SERVER_NAME = os.getenv("SERVER_NAME", None)
     SQLALCHEMY_ENGINE_OPTIONS = {"poolclass": NullPool}
     SECRET_KEY = os.getenv(
@@ -28,6 +36,19 @@ class Config(object):
             )
         ),
     )
+    JWT_SECRET_KEY = os.getenv(
+        "SECRET_KEY",
+        SECRET_KEY,
+    )
+    JWT_TOKEN_LOCATION = ["headers", "cookies"]
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=7)
+    JWT_IDENTITY_CLAIM = "user"
+    JWT_ERROR_MESSAGE_KEY = "error"
+    JWT_COOKIE_SECURE = True
+    ROLES: "RolesDict" = {
+        "user": Permission(RoleNeed("user")),
+        "manager": Permission(RoleNeed("manager")),
+    }
 
 
 class DevConfig(Config):
