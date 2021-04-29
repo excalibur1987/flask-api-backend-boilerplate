@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING, Any, List, Union
 
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
@@ -11,6 +11,17 @@ from app.database import BaseModel, db
 
 if TYPE_CHECKING:
     from ._Role import Role  # NOQA
+
+
+class PasswordHelper:
+    password: str
+
+    def __init__(self, password) -> None:
+        self.password = password
+
+    def __eq__(self, o: object) -> bool:
+        equality: bool = check_password_hash(self.password, o)
+        return equality
 
 
 class User(BaseModel):
@@ -51,6 +62,7 @@ class User(BaseModel):
 
     # Define the relationship to Role via UserRoles
     roles = relationship("Role", secondary="user_roles")
+    token = ""
 
     def __init__(
         self,
@@ -75,6 +87,16 @@ class User(BaseModel):
         self.last_name = last_name
         self.first_name_ar = first_name_ar
         self.last_name_ar = last_name_ar
+
+    def __setattr__(self, name, value):
+        if name == "password":
+            self.password = generate_password_hash(value)
+        super(User, self).__setattr__(name, value)
+
+    def __getattribute__(self, name: str) -> Any:
+        if name == "password":
+            return PasswordHelper(super(User, self).__getattribute__("password"))
+        return super(User, self).__getattribute__(name)
 
     @hybrid_property
     def name(self) -> str:
