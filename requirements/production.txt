@@ -1,11 +1,10 @@
 flask
 gunicorn
-pandas
 sqlalchemy
 Flask-SQLAlchemy
 SQLAlchemy-Utils
-marshmallow
 Flask-Script
+Flask-Principal
 Flask-Migrate
-flask-restful
+Flask-Restful
 flask-jwt-extended
