@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
 """Click commands."""
 import os
+from getpass import getpass
 from subprocess import call
-from typing import List
+from typing import TYPE_CHECKING, List
 
 import click
 from flask import Flask, current_app
 from flask.cli import with_appcontext
+from sqlalchemy.exc import DatabaseError
 from werkzeug.exceptions import MethodNotAllowed, NotFound
+
+if TYPE_CHECKING:
+    from app.blueprints.users.models import User
+
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.join(HERE, os.pardir)
@@ -21,18 +27,6 @@ def test():
 
     rv = pytest.main([TEST_PATH, "--verbose"])
     exit(rv)
-
-
-@click.command()
-@click.option(
-    "-f",
-    "--fix-imports",
-    default=False,
-    is_flag=True,
-    help="Fix imports using isort, before linting",
-)
-def lint(fix_imports):
-    linter(fix_imports)
 
 
 def getfiles_paths(path: str) -> List[str]:
@@ -49,7 +43,15 @@ def getfiles_paths(path: str) -> List[str]:
     return files
 
 
-def linter(fix_imports):
+@click.command()
+@click.option(
+    "-f",
+    "--fix-imports",
+    default=False,
+    is_flag=True,
+    help="Fix imports using isort, before linting",
+)
+def lint(fix_imports):
     """Lint and check code style with flake8 and isort."""
 
     def execute_tool(description, *args, targets: List[str]):
@@ -63,7 +65,7 @@ def linter(fix_imports):
     execute_tool("Formatting Files", "black", targets=["."])
     if fix_imports:
         execute_tool(
-            "Fixing import order", "isort", "--atomic", "-m", "3", targets=["."]
+            "Fixing import order", "isort", "--profile", "black", targets=["."]
         )
     files = [
         f
@@ -151,11 +153,107 @@ def urls(url, order):
         click.echo(str_template.format(*row[:column_length]))
 
 
+def add_user_helper() -> "User":
+    from app.blueprints.users.models import User
+
+    username = input("Username:")
+    while True:
+        password = getpass("Password:")
+        password_check = getpass("Type Password Again:")
+        if password != password_check:
+            print("Password & password check are not the same")
+        else:
+            break
+    email = input("Email:")
+    mobile = input("Mobile:")
+    first_name = input("First Name:")
+    last_name = input("Last Name:")
+    first_name_ar = input("First Name Ar:")
+    last_name_ar = input("Last Name Ar:")
+
+    return User(
+        username=username,
+        password=password,
+        email=email,
+        mobile=mobile,
+        first_name=first_name,
+        last_name=last_name,
+        first_name_ar=first_name_ar,
+        last_name_ar=last_name_ar,
+    )
+
+
+@click.command()
+@click.argument("roles", nargs=-1)
+@with_appcontext
+def add_roles(roles: List[str]):
+    """Add roles to be used with users."""
+    from app.blueprints.users.models import Role
+    from app.database import db
+
+    try:
+        db.session.add_all([Role(role) for role in roles if not Role.get(name=role)])
+        db.session.commit()
+    except DatabaseError:
+        print("Error adding roles")
+
+
+@click.command()
+@with_appcontext
+def add_superuser():
+    """Add Superuser."""
+    from app.blueprints.users.models import Role
+    from app.database import db
+
+    try:
+        admin_role = Role.get(name="admin") or Role("admin")
+        if not admin_role.id:
+            db.session.add(admin_role)
+            db.session.flush()
+    except DatabaseError:
+        print("Error finding or adding admin role")
+        return False
+    try:
+        user = add_user_helper()
+        db.session.add(user)
+        db.session.flush()
+        user.add_roles(admin_role)
+        db.session.commit()
+    except DatabaseError:
+        print("Error adding user")
+
+
+@click.command()
+@with_appcontext
+def add_user():
+    """Add User."""
+    from app.blueprints.users.models import Role
+    from app.database import db
+
+    try:
+        user = add_user_helper()
+        db.session.add(user)
+        db.session.flush()
+        roles_names = input("Roles(Comma separated):").split(",")
+        roles = [
+            role
+            for role in [Role.get(name=role) for role in roles_names]
+            if role is not None
+        ]
+        user.add_roles(roles)
+        db.session.commit()
+    except DatabaseError:
+        print("Error adding user")
+
+
 def register_commands(app: Flask) -> Flask:
     """Register Click commands."""
-    app.cli.add_command(test)
-    app.cli.add_command(lint)
+    app.cli.add_command(add_roles, "add-roles")
+    app.cli.add_command(add_superuser, "add-superuser")
+    app.cli.add_command(add_user, "add-user")
     app.cli.add_command(clean)
+    app.cli.add_command(lint)
+    app.cli.add_command(test)
     app.cli.add_command(urls)
 
     return app
