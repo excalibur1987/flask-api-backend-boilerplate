@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 from flask_principal import Principal
 
 from app.database import db
-from app.handlers import user_identity_lookup, user_lookup_callback
+from app.handlers import jwt_handlers
 
 jwt = JWTManager()
 migrate = Migrate()
@@ -35,8 +35,6 @@ def register_extensions(app: Flask) -> Flask:
     # Configure JWT and its loaders
     jwt.init_app(app)
 
-    jwt.user_identity_loader(user_identity_lookup)
-
-    jwt.user_lookup_loader(user_lookup_callback)
+    jwt_handlers(jwt, app)
 
     return app
