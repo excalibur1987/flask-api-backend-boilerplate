@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Click commands."""
 import os
+import re
 from getpass import getpass
 from subprocess import call
 from typing import TYPE_CHECKING, List
@@ -156,7 +157,7 @@ def urls(url, order):
 def add_user_helper() -> "User":
     from app.blueprints.users.models import User
 
-    username = input("Username:")
+    username = input("Username:").lower()
     while True:
         password = getpass("Password:")
         password_check = getpass("Type Password Again:")
@@ -164,10 +165,16 @@ def add_user_helper() -> "User":
             print("Password & password check are not the same")
         else:
             break
-    email = input("Email:")
-    mobile = input("Mobile:")
-    first_name = input("First Name:")
-    last_name = input("Last Name:")
+    email = input("Email:").lower()
+    while True:
+        mobile = input("Mobile:")
+        if not re.match(r"\+?\d*", mobile):
+            print("Enter a valid mobile number")
+            continue
+        break
+
+    first_name = input("First Name:").title()
+    last_name = input("Last Name:").title()
     first_name_ar = input("First Name Ar:")
     last_name_ar = input("Last Name Ar:")
 
@@ -216,7 +223,8 @@ def add_superuser():
     try:
         user = add_user_helper()
         db.session.add(user)
-        db.session.flush()
+        db.session.commit()
+        print("User added successfully.")
         user.add_roles(admin_role)
         db.session.commit()
     except DatabaseError:

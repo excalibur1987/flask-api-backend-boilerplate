@@ -27,8 +27,11 @@ def jwt_handlers(jwt: JWTManager, app: Flask):
 
     def user_lookup_callback(_jwt_header, jwt_data):
 
-        from app.blueprints.users.models import User
+        from app.blueprints.users.models import Session, User
 
+        session = Session.get(token=jwt_data["jti"], user_id=jwt_data["user"])
+        if not session:
+            raise InvalidUsage.invalid_session()
         user_id = jwt_data["user"]
         user = User.get(user_id)
         if not user or not user.active:

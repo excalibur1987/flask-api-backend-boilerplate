@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Type, TypeVar
 
 from flask.globals import current_app
 from flask_jwt_extended import current_user
@@ -9,6 +9,7 @@ from sqlalchemy import Column, and_, text
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.mutable import Mutable
+from sqlalchemy.sql.expression import or_
 from sqlalchemy.sql.schema import ForeignKey, MetaData
 from sqlalchemy.sql.sqltypes import INTEGER, Boolean, DateTime, String
 
@@ -27,6 +28,8 @@ metadata = MetaData(
 
 db = SQLAlchemy(metadata=metadata)
 
+T = TypeVar("T")
+
 
 class ExtendedModel(Model):
     id = Column(INTEGER, primary_key=True, nullable=False)
@@ -39,12 +42,28 @@ class ExtendedModel(Model):
         db.session.commit()
 
     @classmethod
-    def get(cls, id=None, **kwargs):
+    def get(cls: T, id: int = None, **kwargs) -> T:
+        """Gets class instance using id or named attributes
+        Args:
+            id (int, optional): User id.
+            kwargs: named arguments must be an attribute of the class
+        Returns:
+            An instance of the class
+        """
+        for arg in kwargs.keys():
+            assert hasattr(cls, arg)
         return (
-            db.session.query(cls).get(id)
-            if id
-            else db.session.query(cls)
-            .filter(and_(*[getattr(cls, arg) == val for arg, val in kwargs.items()]))
+            db.session.query(cls)
+            .filter(
+                and_(
+                    or_(cls.id == id, id == None),
+                    *[
+                        getattr(cls, arg) == val
+                        for arg, val in kwargs.items()
+                        if hasattr(cls, arg)
+                    ]
+                )
+            )
             .one_or_none()
         )
 
@@ -52,6 +71,26 @@ class ExtendedModel(Model):
         for key in self.__dict__:
             if not key.startswith("_"):
                 yield key, getattr(self, key)
+
+    def save(self, persist=True):
+        """Saves instance to database
+
+        Args:
+            persist (bool, optional): Commit changes. Defaults to True.
+        """
+        db.session.add(self)
+        if persist:
+            db.session.commit()
+
+    def delete(self, persist=False):
+        """Deletes instance from database
+
+        Args:
+            persist (bool, optional): Commit changes. Defaults to False.
+        """
+        db.session.delete(self)
+        if persist:
+            db.session.commit()
 
 
 db = SQLAlchemy(model_class=ExtendedModel)

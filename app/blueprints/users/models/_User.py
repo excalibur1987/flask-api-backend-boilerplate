@@ -10,7 +10,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from app.database import BaseModel, db
 
 if TYPE_CHECKING:
-    from ._Role import Role  # NOQA
+    from ._Role import Role
+    from ._Session import Session
 
 
 class PasswordHelper:
@@ -60,8 +61,15 @@ class User(BaseModel):
     #     primaryjoin="User.user_id==foreign(User.manager_id)",
     # )
 
+    # Relationships
+
     # Define the relationship to Role via UserRoles
-    roles = relationship("Role", secondary="user_roles")
+    roles: List["Role"] = relationship("Role", secondary="user_roles")
+    # user sessions
+    sessions: List["Session"] = relationship(
+        "Session", order_by="Session.created_at.asc()", uselist=True
+    )
+
     token = ""
 
     def __init__(
@@ -88,10 +96,8 @@ class User(BaseModel):
         self.first_name_ar = first_name_ar
         self.last_name_ar = last_name_ar
 
-    def __setattr__(self, name, value):
-        if name == "password":
-            self.password = generate_password_hash(value)
-        super(User, self).__setattr__(name, value)
+    def set_password(self, newpwd):
+        self.password = generate_password_hash(newpwd)
 
     def __getattribute__(self, name: str) -> Any:
         if name == "password":
