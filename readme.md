@@ -12,6 +12,8 @@ This is the backend api boilerplate to be used with other frontend apps.
 
 ## Usage
 
+To start intial setup run `source intialize.sh` then make sure to have the following environment variable `DATABASE_URL` & `SECRET_KEY`.
+
 This backend uses flask-restful class based resources. A helper function available is "has_roles", it's used as following.
 
     from flask_restful import Resource

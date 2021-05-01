@@ -8,3 +8,4 @@ Flask-Principal
 Flask-Migrate
 Flask-Restful
 flask-jwt-extended
+psycopg2-binary
