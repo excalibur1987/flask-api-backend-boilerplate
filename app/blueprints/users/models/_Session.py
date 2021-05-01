@@ -22,7 +22,6 @@ class Session(BaseModel):
     created_at = Column(
         TIMESTAMP(True),
         nullable=False,
-        default=datetime.now(tz=current_app.config["TZ"]),
     )
 
     def __init__(
@@ -33,3 +32,4 @@ class Session(BaseModel):
         self.ip_address = ip_address
         self.platform = platform
         self.browser = browser
+        self.created_at = datetime.now(tz=current_app.config["TZ"])

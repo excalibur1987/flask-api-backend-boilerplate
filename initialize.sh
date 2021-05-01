@@ -7,9 +7,12 @@ pip install -r ./requirements/development.txt
 pre-commit install
 
 touch .env
-echo 'export Sercret_KEY="your secret key here' >> .env
-echo 'export DATABASE_URL="your database connection string' >> .env
+echo 'export Sercret_KEY="your secret key here"' >> .env
+echo 'export DATABASE_URL="your database connection string"' >> .env
+echo 'export FLASK_APP="autoapp:app"' >> .env
+echo 'export TZ="UTC"' >> .env
 
+source .env
 
 mkdir .vscode
 
@@ -28,3 +31,8 @@ echo '\n\t\t\t"jinja": true\n\t\t}\n\t]\n}' >> .vscode/launch.json
 sed -i 's+\t+    +g' .vscode/launch.json
 
 echo "Edit your .env file then source it & run 'flask db upgrade'"
+
+rm ./intialize.sh
+git add .
+git commit --amend -m "initial commit"
+git push --force
