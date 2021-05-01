@@ -135,7 +135,7 @@ class CancelableModel(object):
             raise InvalidUsage.user_not_found()
         self.cancelled = True
         self.cancelled_by_id = current_user.id
-        self.date_cancelled = datetime.now()
+        self.date_cancelled = datetime.now(tz=current_app.config["TZ"])
         db.session.commit()
 
 

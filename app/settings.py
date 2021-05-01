@@ -46,7 +46,6 @@ class Config(object):
 class DevConfig(Config):
 
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=60 * 60)
-    SESSION_TYPE = "redis"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     FLASK_ENV = "development"
     SECRET_KEY = "secretkey"
@@ -56,7 +55,6 @@ class DevConfig(Config):
 
 class ProdConfig(Config):
 
-    PGSSLMODE = os.getenv("PGSSLMODE")
     SESSION_COOKIE_SECURE = True
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=180)
     FLASK_ENV = "production"

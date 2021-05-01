@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from app.database import BaseModel
+from flask.globals import current_app
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import BOOLEAN, INTEGER, TIMESTAMP, String
-
-from app.database import BaseModel
 
 if TYPE_CHECKING:
     from ._User import User
@@ -20,7 +20,9 @@ class Session(BaseModel):
     browser = Column(String, nullable=True)
     active = Column(BOOLEAN, nullable=False, default=True)
     created_at = Column(
-        TIMESTAMP(True), nullable=False, default=datetime.now().astimezone()
+        TIMESTAMP(True),
+        nullable=False,
+        default=datetime.now(tz=current_app.config["TZ"]),
     )
 
     def __init__(
