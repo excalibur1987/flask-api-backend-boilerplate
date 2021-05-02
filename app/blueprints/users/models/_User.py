@@ -1,13 +1,16 @@
+import re
 from typing import TYPE_CHECKING, Any, List, Union
 
+from app.blueprints.users.exceptions import UserExceptions
+from app.database import BaseModel, db
+from app.utils.file_storage import FileStorage
+from flask import current_app
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import BOOLEAN, String
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from app.database import BaseModel, db
 
 if TYPE_CHECKING:
     from ._Role import Role
@@ -96,13 +99,26 @@ class User(BaseModel):
         self.first_name_ar = first_name_ar
         self.last_name_ar = last_name_ar
 
-    def set_password(self, newpwd):
+    def set_password(self, newpwd: str, pwdcheck: str):
+        regx = re.compile(current_app.config["PASSWORD_RULE"])
+        if newpwd is None:
+            return
+        if newpwd != pwdcheck or not regx.match(newpwd):
+            raise UserExceptions.password_check_invalid()
         self.password = generate_password_hash(newpwd)
 
     def __getattribute__(self, name: str) -> Any:
-        if name == "password":
-            return PasswordHelper(super(User, self).__getattribute__("password"))
-        return super(User, self).__getattribute__(name)
+        def default_getter(name_: str):
+            return super(User, self).__getattribute__(name)
+
+        getters = {
+            "password": lambda name_: PasswordHelper(
+                super(User, self).__getattribute__(name_)
+            ),
+            "photo": lambda name_: FileStorage(url=default_getter(name_)),
+        }
+
+        return getters.get(name, default_getter)(name)
 
     @hybrid_property
     def name(self) -> str:
