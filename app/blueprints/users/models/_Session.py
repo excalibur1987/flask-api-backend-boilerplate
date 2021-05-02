@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from app.database import BaseModel
 from flask.globals import current_app
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import BOOLEAN, INTEGER, TIMESTAMP, String
+
+from app.database import BaseModel
 
 if TYPE_CHECKING:
     from ._User import User
