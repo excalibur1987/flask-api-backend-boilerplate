@@ -9,8 +9,6 @@ def template(
 
 
 USER_NOT_FOUND = template(["User not found"], code=404)
-WRONG_LOGIN_CREDS = template(["Username or password are not correct"], code=404)
-USER_ALREADY_REGISTERED = template(["User already registered"], code=422)
 UNKNOWN_ERROR = template([], code=500)
 USER_NOT_AUTHORIZED = template(["Unauthorized access"], code=401)
 INVALID_SESSION = template(["Invalid login session, please re-login"], code=401)
@@ -49,10 +47,6 @@ class InvalidUsage(Exception):
         return cls(**USER_NOT_FOUND)
 
     @classmethod
-    def user_already_registered(cls):
-        return cls(**USER_ALREADY_REGISTERED)
-
-    @classmethod
     def user_not_authorized(cls):
         return cls(**USER_NOT_AUTHORIZED)
 
@@ -63,10 +57,6 @@ class InvalidUsage(Exception):
     @classmethod
     def empty_missing_file(cls):
         return cls(**EMPTY_MISSING_FILE)
-
-    @classmethod
-    def wrong_login_creds(cls):
-        return cls(**WRONG_LOGIN_CREDS)
 
     @classmethod
     def unsupported_format(cls):
