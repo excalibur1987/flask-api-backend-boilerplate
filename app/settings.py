@@ -8,15 +8,10 @@ from sqlalchemy.pool import NullPool
 
 
 class Config(object):
+    # General Flask configurations
     FLASK_APP = os.getenv("FLASK_APP", "autoapp:app")
-    DATABASE_URL = os.getenv("DATABASE_URL")
-    SESSION_PERMANENT = True
-    SESSION_TYPE = "filesystem"
-    SESSION_COOKIE_SECURE = True
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     TZ = pytz.timezone(os.getenv("TZ", "UTC"))
     SERVER_NAME = os.getenv("SERVER_NAME", None)
-    SQLALCHEMY_ENGINE_OPTIONS = {"poolclass": NullPool}
     SECRET_KEY = os.getenv(
         "SECRET_KEY",
         "".join(
@@ -29,6 +24,21 @@ class Config(object):
             )
         ),
     )
+
+    # Regex rule to check against user's password
+    PASSWORD_RULE = os.getenv("PASSWORD_RULE", ".*")
+    # Storage target to handle file storage
+    STORAGE_TARGET = os.getenv("STORAGE_TARGET")
+
+    # Sqlalchemy Configuration
+    DATABASE_URL = os.getenv("DATABASE_URL")
+    SESSION_PERMANENT = True
+    SESSION_TYPE = "filesystem"
+    SESSION_COOKIE_SECURE = True
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+    SQLALCHEMY_ENGINE_OPTIONS = {"poolclass": NullPool}
+
+    # JWT Configurations
     JWT_SECRET_KEY = os.getenv(
         "SECRET_KEY",
         SECRET_KEY,
@@ -41,6 +51,13 @@ class Config(object):
     JWT_COOKIE_CSRF_PROTECT = True
     JWT_CSRF_METHODS = ["POST", "PUT", "PATCH", "DELETE", "GET"]
     JWT_CSRF_IN_COOKIES = False
+
+    # AWS Configurations
+    AWS_ACCESS_KEY_ID = os.getenv("BUCKETEER_AWS_ACCESS_KEY_ID", None)
+    AWS_REGION = os.getenv("BUCKETEER_AWS_REGION", None)
+    AWS_SECRET_ACCESS_KEY = os.getenv("BUCKETEER_AWS_SECRET_ACCESS_KEY", None)
+    S3_BUCKET_NAME = os.getenv("BUCKETEER_BUCKET_NAME", None)
+    AWS_ENDPOINT = os.getenv("AWS_ENDPOINT", None)
 
 
 class DevConfig(Config):
