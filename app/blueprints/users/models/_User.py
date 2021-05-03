@@ -1,11 +1,10 @@
 import re
-from typing import TYPE_CHECKING, Any, List, Union
+from typing import TYPE_CHECKING, List, Union
 
 from app.blueprints.users.exceptions import UserExceptions
 from app.database import BaseModel, db
 from app.utils.file_storage import FileStorage
 from flask import current_app
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.schema import Column
@@ -15,6 +14,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 if TYPE_CHECKING:
     from ._Role import Role
     from ._Session import Session
+
+    hybrid_property = property
+else:
+    from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class PasswordHelper:
@@ -35,13 +38,13 @@ class User(BaseModel):
         "is_active", BOOLEAN(), nullable=False, server_default=text("1::bool")
     )
 
-    password = Column(String, nullable=False, server_default="")
+    _password = Column("password", String, nullable=False, server_default="")
 
     # User identifiers
     email = Column(String, nullable=True)
 
     # meta data
-    photo = Column(String, nullable=True)
+    _photo = Column("photo", String, nullable=True)
     mobile = Column(String, nullable=True)
 
     # User information
@@ -89,10 +92,10 @@ class User(BaseModel):
         last_name_ar: str = "",
     ) -> None:
         self.username = username
-        self.password = generate_password_hash(password)
+        self._password = generate_password_hash(password)
         self.active = active
         self.email = email
-        self.photo = photo
+        self._photo = photo
         self.mobile = mobile
         self.first_name = first_name
         self.last_name = last_name
@@ -105,20 +108,15 @@ class User(BaseModel):
             return
         if newpwd != pwdcheck or not regx.match(newpwd):
             raise UserExceptions.password_check_invalid()
-        self.password = generate_password_hash(newpwd)
+        self._password = generate_password_hash(newpwd)
 
-    def __getattribute__(self, name: str) -> Any:
-        def default_getter(name_: str):
-            return super(User, self).__getattribute__(name)
+    @hybrid_property
+    def photo(self) -> FileStorage:
+        return FileStorage(url=self._photo)
 
-        getters = {
-            "password": lambda name_: PasswordHelper(
-                super(User, self).__getattribute__(name_)
-            ),
-            "photo": lambda name_: FileStorage(url=default_getter(name_)),
-        }
-
-        return getters.get(name, default_getter)(name)
+    @hybrid_property
+    def password(self) -> PasswordHelper:
+        return PasswordHelper(self._password)
 
     @hybrid_property
     def name(self) -> str:
