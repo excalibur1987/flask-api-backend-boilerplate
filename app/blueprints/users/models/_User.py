@@ -1,15 +1,16 @@
 import re
 from typing import TYPE_CHECKING, List, Union
 
-from app.blueprints.users.exceptions import UserExceptions
-from app.database import BaseModel, db
-from app.utils.file_storage import FileStorage
 from flask import current_app
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import BOOLEAN, String
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from app.blueprints.users.exceptions import UserExceptions
+from app.database import BaseModel, db
+from app.utils.file_storage import FileStorage
 
 if TYPE_CHECKING:
     from ._Role import Role
@@ -108,7 +109,7 @@ class User(BaseModel):
             return
         if newpwd != pwdcheck or not regx.match(newpwd):
             raise UserExceptions.password_check_invalid()
-        self._password = generate_password_hash(newpwd)
+        self.password = generate_password_hash(newpwd)
 
     @hybrid_property
     def photo(self) -> FileStorage:
@@ -139,3 +140,7 @@ class User(BaseModel):
         ]
 
         db.session.add_all(new_roles)
+
+    def delete(self, persist=False):
+        self.photo.delete()
+        super().delete(persist=persist)

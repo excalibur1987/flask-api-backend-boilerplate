@@ -1,9 +1,15 @@
 from typing import Dict
 
 import werkzeug
-from flask import Blueprint, request
+from flask import Blueprint, jsonify, request
 from flask.helpers import make_response
-from flask_jwt_extended import current_user, jwt_required, set_access_cookies
+from flask.wrappers import Response
+from flask_jwt_extended import (
+    current_user,
+    jwt_required,
+    set_access_cookies,
+    unset_jwt_cookies,
+)
 from flask_jwt_extended.utils import create_access_token, get_csrf_token, get_jti
 from flask_restful import Api, Resource, fields, marshal, marshal_with
 from flask_restful.reqparse import RequestParser
@@ -35,20 +41,42 @@ class UserResource(Resource):
         type=str,
         required=True,
         help="You must provide a password",
-        location=["form"],
+        location=["form", "json"],
     )
     parser.add_argument(
         "username",
         type=str,
         required=True,
         help="You must provide username or email",
-        location=["form"],
+        location=["form", "json"],
     )
 
     @jwt_required()
     @marshal_with(user_serializer)
     def get(self, id=None):
         return User.get(id) if id else current_user
+
+    @jwt_required()
+    def delete(self):
+        self.parser.add_argument(
+            "confirm",
+            type=bool,
+            required=True,
+            help="Must confirm deleting user account",
+            location=["json"],
+        )
+        args = self.parser.parse_args()
+
+        if (
+            current_user.username != args.get("username", None)
+            or current_user.password != args.get("password", None)
+            or not args.get("confirm", False)
+        ):
+            raise UserExceptions.wrong_login_creds()
+        current_user.delete()
+        response: Response = jsonify({"message": "User Account deleted succefully!"})
+        unset_jwt_cookies(response)
+        return response
 
     def post(self):
         args = self.parser.parse_args()
