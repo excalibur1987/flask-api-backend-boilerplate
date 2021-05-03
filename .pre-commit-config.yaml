@@ -10,8 +10,3 @@ repos:
     rev: 3.9.1
     hooks:
     - id: flake8
--   repo: https://github.com/commitizen-tools/commitizen
-    rev: v2.17.4
-    hooks:
-    - id: commitizen
-      stages: [commit-msg]
