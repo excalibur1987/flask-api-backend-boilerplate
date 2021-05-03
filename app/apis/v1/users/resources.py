@@ -16,7 +16,6 @@ from flask_restful.reqparse import RequestParser
 from sqlalchemy.sql.expression import or_
 from sqlalchemy.sql.functions import func
 
-from app.blueprints.users.utils import extract_request_info
 from app.database import db
 from app.utils.decorators import has_roles
 from app.utils.file_storage import FileStorage
@@ -24,8 +23,9 @@ from app.utils.file_storage import FileStorage
 from .exceptions import UserExceptions
 from .models import Session, User
 from .serializers import session_serializer, user_serializer
+from .utils import extract_request_info
 
-blueprint = Blueprint("users", __name__, url_prefix="/api")
+blueprint = Blueprint("users", __name__)
 
 
 api = Api(blueprint)

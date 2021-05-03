@@ -13,7 +13,7 @@ from sqlalchemy.exc import DatabaseError
 from werkzeug.exceptions import MethodNotAllowed, NotFound
 
 if TYPE_CHECKING:
-    from app.blueprints.users.models import User
+    from app.apis.v1.users.models import User
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -155,7 +155,7 @@ def urls(url, order):
 
 
 def add_user_helper() -> "User":
-    from app.blueprints.users.models import User
+    from app.apis.v1.users.models import User
 
     username = input("Username:").lower()
     while True:
@@ -195,7 +195,7 @@ def add_user_helper() -> "User":
 @with_appcontext
 def add_roles(roles: List[str]):
     """Add roles to be used with users."""
-    from app.blueprints.users.models import Role
+    from app.apis.v1.users.models import Role
     from app.database import db
 
     try:
@@ -209,7 +209,7 @@ def add_roles(roles: List[str]):
 @with_appcontext
 def add_superuser():
     """Add Superuser."""
-    from app.blueprints.users.models import Role
+    from app.apis.v1.users.models import Role
     from app.database import db
 
     try:
@@ -235,7 +235,7 @@ def add_superuser():
 @with_appcontext
 def add_user():
     """Add User."""
-    from app.blueprints.users.models import Role
+    from app.apis.v1.users.models import Role
     from app.database import db
 
     try:
