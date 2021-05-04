@@ -10,10 +10,14 @@ from flask_jwt_extended import (
     set_access_cookies,
     unset_jwt_cookies,
 )
-from flask_jwt_extended.utils import create_access_token, get_csrf_token, get_jti
-from flask_restful import Api, Resource, fields, marshal, marshal_with
-from flask_restful.reqparse import RequestParser
-from sqlalchemy.sql.expression import or_
+from flask_jwt_extended.utils import (
+    create_access_token,
+    get_csrf_token,
+    get_jti,
+    get_jwt,
+)
+from flask_restx import Api, Resource, marshal
+from sqlalchemy.sql.expression import and_, or_
 from sqlalchemy.sql.functions import func
 
 from app.database import db
@@ -22,50 +26,47 @@ from app.utils.file_storage import FileStorage
 
 from .exceptions import UserExceptions
 from .models import Session, User
+from .parsers import settings_parser, user_delete_parser, user_login_parser
 from .serializers import session_serializer, user_serializer
 from .utils import extract_request_info
 
 blueprint = Blueprint("users", __name__)
 
 
-api = Api(blueprint)
+api = Api(
+    blueprint,
+    authorizations={
+        "apikey": {"type": "apiKey", "in": "header", "name": "X-CSRF-TOKEN"}
+    },
+    security="apikey",
+)
+ns = api.namespace("", description="Users operations")
 
+user_model = api.model(
+    "User",
+    user_serializer,
+)
+
+session_model = api.model("Sessions", session_serializer)
 
 current_user: "User"
 
 
 class UserResource(Resource):
-    parser = RequestParser()
-    parser.add_argument(
-        "password",
-        type=str,
-        required=True,
-        help="You must provide a password",
-        location=["form", "json"],
-    )
-    parser.add_argument(
-        "username",
-        type=str,
-        required=True,
-        help="You must provide username or email",
-        location=["form", "json"],
-    )
+    @jwt_required()
+    @ns.doc("get user's info by id, or current user's")
+    @ns.marshal_with(user_model, skip_none=True)
+    def get(self):
+        """Gets current user's info"""
+
+        return current_user
 
     @jwt_required()
-    @marshal_with(user_serializer)
-    def get(self, id=None):
-        return User.get(id) if id else current_user
-
-    @jwt_required()
+    @ns.doc("delete user's own account")
+    @ns.expect(user_delete_parser)
     def delete(self):
-        self.parser.add_argument(
-            "confirm",
-            type=bool,
-            required=True,
-            help="Must confirm deleting user account",
-            location=["json"],
-        )
-        args = self.parser.parse_args()
+        """Delets user's account permenantly"""
+        args = user_login_parser.parse_args()
 
         if (
             current_user.username != args.get("username", None)
@@ -78,8 +79,13 @@ class UserResource(Resource):
         unset_jwt_cookies(response)
         return response
 
+    @ns.doc("login user")
+    @ns.response(200, "Successful login", model=user_model)
+    @ns.expect(user_login_parser)
     def post(self):
-        args = self.parser.parse_args()
+        """User's login view"""
+
+        args = user_login_parser.parse_args()
         user: User = User.query.filter(
             or_(
                 func.lower(User.email) == args.get("username", "").lower(),
@@ -98,12 +104,7 @@ class UserResource(Resource):
         response = make_response(
             marshal(
                 user,
-                {
-                    **user_serializer,
-                    **{
-                        "token": fields.String,
-                    },
-                },
+                user_model,
             )
         )
         set_access_cookies(response=response, encoded_access_token=token)
@@ -111,62 +112,13 @@ class UserResource(Resource):
 
 
 class UserSettings(Resource):
-
-    parser_settings = RequestParser()
-    parser_settings.add_argument(
-        "pwd",
-        dest="newpwd",
-        type=str,
-        default=None,
-        location=["form"],
-    )
-    parser_settings.add_argument(
-        "pwdCheck",
-        dest="pwdcheck",
-        type=str,
-        default=None,
-        location=["form"],
-    )
-    parser_settings.add_argument(
-        "email",
-        type=str,
-        location=["form"],
-    )
-    parser_settings.add_argument(
-        "firstName",
-        dest="first_name",
-        type=str,
-        location=["form"],
-    )
-    parser_settings.add_argument(
-        "lastName",
-        dest="last_name",
-        type=str,
-        location=["form"],
-    )
-    parser_settings.add_argument(
-        "firstNameAr",
-        dest="first_name_ar",
-        type=str,
-        location=["form"],
-    )
-    parser_settings.add_argument(
-        "lastNameAr",
-        dest="last_name_ar",
-        type=str,
-        location=["form"],
-    )
-    parser_settings.add_argument(
-        "photo",
-        default=None,
-        type=werkzeug.datastructures.FileStorage,
-        location="files",
-    )
-
     @jwt_required()
-    @marshal_with(user_serializer)
+    @ns.doc("update user's info")
+    @ns.marshal_with(user_model)
+    @ns.expect(settings_parser)
     def put(self):
-        args: Dict = self.parser_settings.parse_args()
+        """Updates user's info"""
+        args: Dict = settings_parser.parse_args()
 
         newpwd = args.pop("newpwd")
         pwdcheck = args.pop("pwdcheck")
@@ -190,43 +142,50 @@ class UserSettings(Resource):
 
 
 class UserSessions(Resource):
-    parser = RequestParser()
-    parser.add_argument(
-        "id",
-        type=int,
-        required=True,
-        help="You must provide a valid id",
-        location=["form"],
-    )
-
     @jwt_required()
-    @marshal_with(session_serializer)
-    def get(self):
-        sessions = current_user.sessions
+    @ns.doc("get user's active sessions")
+    @ns.marshal_list_with(session_model)
+    def get(self, slug: str = None):
+        """Gets a list of user's active sessions"""
+
+        sessions = Session.get(slug=slug) or current_user.sessions
         return sessions
 
     @jwt_required()
-    def delete(self):
-        """Delete User session by providing id
+    @ns.marshal_list_with(session_model)
+    def delete(self, slug: str = None):
+        """Invalidates all users sessions except the current sessions"""
 
-        Returns:
-            [type]: [description]
-        """
-        args = self.parser.parse_args()
-        user_session = Session.get(id=args["id"], user_id=current_user.id)
-        if user_session:
-            user_session.delete(True)
-        return {"message": "Session deleted successfully."}
+        active_session_token = get_jwt()["jti"]
+
+        user_sessions = Session.query.filter(
+            or_(
+                and_(
+                    Session.user_id == current_user.id,
+                    Session.token != active_session_token,
+                    slug != None,
+                ),
+                Session.slug == slug,
+            )
+        ).all()
+        for session_ in user_sessions:
+            session_.delete(True)
+        return current_user.sessions
 
 
 class UsersResource(Resource):
     @jwt_required()
+    @ns.marshal_list_with(user_model, envelope="users")
+    @ns.doc("Gets a list of active users")
     @has_roles("admin")
     def get(self):
-        return marshal(User.query.all(), user_serializer, envelope="users")
+        """Gets a list of active users"""
+        return User.query.filter(User.active).all()
 
 
-api.add_resource(UserResource, "/user", "/user/<int:id>")
-api.add_resource(UserSettings, "/user/settings")
-api.add_resource(UsersResource, "/users")
-api.add_resource(UserSessions, "/user/sessions", "/user/session")
+ns.add_resource(UserResource, "/user")
+ns.add_resource(UserSettings, "/user/settings")
+ns.add_resource(UsersResource, "/users")
+ns.add_resource(
+    UserSessions, "/user/sessions", "/user/sessions/<slug>", endpoint="sessions"
+)

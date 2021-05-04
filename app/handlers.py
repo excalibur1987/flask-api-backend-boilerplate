@@ -13,7 +13,7 @@ from flask_principal import (
 from app.exceptions import InvalidUsage
 
 if TYPE_CHECKING:
-    from app.blueprints.users.models import User
+    from app.apis.v1.users.models import User
 
 
 def on_identity_loaded(sender, identity: int):
@@ -27,7 +27,7 @@ def jwt_handlers(jwt: JWTManager, app: Flask):
 
     def user_lookup_callback(_jwt_header, jwt_data):
 
-        from app.blueprints.users.models import Session, User
+        from app.apis.v1.users.models import Session, User
 
         session = Session.get(token=jwt_data["jti"], user_id=jwt_data["user"])
         if not session:
