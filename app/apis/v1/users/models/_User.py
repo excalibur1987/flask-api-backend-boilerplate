@@ -78,7 +78,7 @@ class User(BaseModel):
         "Session", order_by="Session.created_at.asc()", uselist=True
     )
 
-    token = ""
+    token = None
 
     def __init__(
         self,
