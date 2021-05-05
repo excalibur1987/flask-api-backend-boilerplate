@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -15,11 +16,12 @@ class Session(BaseModel):
     __tablename__ = "sessions"
 
     user_id = Column(INTEGER, ForeignKey("users.id"), nullable=False)
-    token = Column(String, nullable=True)
+    token = Column(String, nullable=False)
     ip_address = Column(String, nullable=True)
     platform = Column(String, nullable=True)
     browser = Column(String, nullable=True)
     active = Column(BOOLEAN, nullable=False, default=True)
+    slug = Column(String, nullable=False)
     created_at = Column(
         TIMESTAMP(True),
         nullable=False,
@@ -33,4 +35,5 @@ class Session(BaseModel):
         self.ip_address = ip_address
         self.platform = platform
         self.browser = browser
+        self.slug = uuid.uuid4()
         self.created_at = datetime.now(tz=current_app.config["TZ"])

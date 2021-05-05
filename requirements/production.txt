@@ -6,7 +6,7 @@ SQLAlchemy-Utils
 Flask-Script
 Flask-Principal
 Flask-Migrate
-Flask-Restful
+flask-restx
 flask-jwt-extended
 psycopg2-binary
 boto3
