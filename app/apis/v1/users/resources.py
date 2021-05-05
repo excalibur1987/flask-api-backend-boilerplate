@@ -1,7 +1,7 @@
 from typing import Dict
 
 import werkzeug
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 from flask.helpers import make_response
 from flask.wrappers import Response
 from flask_jwt_extended import (
@@ -16,11 +16,12 @@ from flask_jwt_extended.utils import (
     get_jti,
     get_jwt,
 )
-from flask_restx import Api, Resource, marshal
+from flask_restx import Resource, marshal
 from sqlalchemy.sql.expression import and_, or_
 from sqlalchemy.sql.functions import func
 
 from app.database import db
+from app.utils import create_api
 from app.utils.decorators import has_roles
 from app.utils.file_storage import FileStorage
 
@@ -30,17 +31,9 @@ from .parsers import settings_parser, user_delete_parser, user_login_parser
 from .serializers import session_serializer, user_serializer
 from .utils import extract_request_info
 
-blueprint = Blueprint("users", __name__)
-
-
-api = Api(
-    blueprint,
-    authorizations={
-        "apikey": {"type": "apiKey", "in": "header", "name": "X-CSRF-TOKEN"}
-    },
-    security="apikey",
+blueprint, api, ns = create_api(
+    name="users", import_name=__name__, description="Users operations"
 )
-ns = api.namespace("", description="Users operations")
 
 user_model = api.model(
     "User",
