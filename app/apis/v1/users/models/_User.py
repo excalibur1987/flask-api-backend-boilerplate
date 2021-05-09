@@ -84,6 +84,7 @@ class User(BaseModel):
         self,
         username: str,
         password: str,
+        password_check: str,
         active: bool = True,
         email: str = None,
         photo: str = None,
@@ -93,6 +94,8 @@ class User(BaseModel):
         first_name_ar: str = "",
         last_name_ar: str = "",
     ) -> None:
+        if password != password_check:
+            raise UserExceptions.password_check_invalid()
         self.username = username
         self._password = generate_password_hash(password)
         self.active = active
