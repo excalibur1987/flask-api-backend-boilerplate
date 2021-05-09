@@ -1,3 +1,4 @@
+from functools import wraps
 from typing import Callable, List, Union
 
 from flask import g
@@ -34,13 +35,13 @@ def has_roles(*args: List[str]):
     ]
 
     def wrapper(fn: Callable):
+        @wraps(fn)
         def wrapped(*args, **kwargs):
             identity: Identity = g.identity
             if not check_roles(identity=identity, roles=roles):
                 raise InvalidUsage.user_not_authorized()
             return fn(*args, **kwargs)
 
-        wrapped.__doc__ = fn.__doc__
         return wrapped
 
     return wrapper
