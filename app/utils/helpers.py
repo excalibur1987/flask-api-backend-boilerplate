@@ -1,10 +1,11 @@
 from typing import Callable, TypeVar
 
 from flask import Blueprint
-from flask_restx import Api
+
+from app.utils.extended_objectes import ExtendedApi
 
 
-def create_api(name: str, description: str, import_name: str):
+def create_api(name: str, description: str, import_name: str, url_prefix: str = ""):
     """A helper function to create blueprint, api and namespace instances
 
     Keyword arguments:
@@ -19,9 +20,9 @@ def create_api(name: str, description: str, import_name: str):
         - ns: namespace instance
     """
 
-    blueprint = Blueprint(name, import_name)
+    blueprint = Blueprint(name, import_name, url_prefix=url_prefix)
 
-    api = Api(
+    api = ExtendedApi(
         blueprint,
         authorizations={
             "apikey": {"type": "apiKey", "in": "header", "name": "X-CSRF-TOKEN"}
