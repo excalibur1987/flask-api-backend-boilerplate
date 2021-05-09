@@ -1,8 +1,7 @@
-## Unreleased
+## 1.0.0 (2021-05-09)
 
 ### Feat
 
-- Extend Flask to simulate blueprint nesting
 - **UserResource**: add ability for the user to delete their account
 - handle changing or updating of user info
 - add filestorage wrapper to handle cloud storage
