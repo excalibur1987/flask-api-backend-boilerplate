@@ -16,25 +16,18 @@ user_login_parser.add_argument(
     location="form",
 )
 
-user_delete_parser = user_login_parser.copy().add_argument(
-    "confirm",
-    type=bool,
-    required=True,
-    help="You must confirm deletion",
-    location="form",
-)
 
-settings_parser = RequestParser()
-settings_parser.add_argument(
+user_info_parser = RequestParser()
+user_info_parser.add_argument(
     "pwd",
-    dest="newpwd",
+    dest="password",
     type=str,
     default=None,
     location="form",
     required=False,
 ).add_argument(
     "pwdCheck",
-    dest="pwdcheck",
+    dest="password_check",
     type=str,
     default=None,
     location="form",
@@ -72,4 +65,19 @@ settings_parser.add_argument(
     default=None,
     type=werkzeug.datastructures.FileStorage,
     location="files",
+)
+
+user_parser = user_info_parser.copy().add_argument(
+    "username",
+    dest="username",
+    type=str,
+    location="form",
+)
+
+user_query_parser = RequestParser()
+user_query_parser.add_argument(
+    "q", choices=["sessions"], type=str, location="args", required=False
+)
+user_query_parser.add_argument(
+    "slug", help="session's identifying", type=str, location="args", required=False
 )
