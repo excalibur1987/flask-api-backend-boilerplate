@@ -1,6 +1,7 @@
-from app.utils import UrlWArgs
 from flask_jwt_extended.utils import get_jwt
 from flask_restx import fields
+
+from app.utils import UrlWArgs
 
 user_serializer = {
     "id": fields.Integer(description="User unique identifier"),

@@ -3,8 +3,9 @@ from typing import Dict, List
 import werkzeug
 from app.database import db
 from app.exceptions import InvalidUsage
-from app.utils import create_api, g
+from app.utils import g
 from app.utils.decorators import has_roles
+from app.utils.extended_objects import ExtendedNameSpace
 from app.utils.file_storage import FileStorage
 from app.utils.parsers import offset_parser
 from flask import jsonify, request
@@ -33,26 +34,22 @@ from .parsers import user_info_parser, user_login_parser, user_parser
 from .serializers import session_serializer, user_serializer
 from .utils import extract_request_info
 
-blueprint, api, ns = create_api(
-    name="users",
-    import_name=__name__,
-    description="Users operations",
-)
+api = ExtendedNameSpace("users", description="Users operations")
 
-user_model = ns.model(
+user_model = api.model(
     "User",
     user_serializer,
 )
 
-session_model = ns.model("Session", session_serializer)
+session_model = api.model("Session", session_serializer)
 
 current_user: "User"
 
 
 class UsersResource(Resource):
     @jwt_required()
-    @ns.doc("get list of users")
-    @ns.marshal_list_with(user_model, skip_none=True)
+    @api.doc("get list of users")
+    @api.marshal_list_with(user_model, skip_none=True)
     def get(
         self,
     ):
@@ -61,9 +58,9 @@ class UsersResource(Resource):
         return current_user
 
     @jwt_required()
-    @ns.doc("Create new user")
-    @ns.marshal_with(user_model)
-    @ns.expect(user_parser)
+    @api.doc("Create new user")
+    @api.marshal_with(user_model)
+    @api.expect(user_parser)
     @has_roles("admin")
     def post(self):
         """Creates new user - requires admin permission-."""
@@ -74,12 +71,12 @@ class UsersResource(Resource):
         return user
 
 
-@ns.param("user_id", "user's id", type=int)
+@api.param("user_id", "user's id", type=int)
 class UserResource(Resource):
     @jwt_required()
-    @ns.doc("get user's info by id, or list of users")
-    @ns.response(200, "user info model", model=user_model)
-    @ns.marshal_with(user_model)
+    @api.doc("get user's info by id, or list of users")
+    @api.response(200, "user info model", model=user_model)
+    @api.marshal_with(user_model)
     def get(self, user_id: int = None):
         """Gets user's info"""
         user = User.get(id=user_id)
@@ -87,9 +84,9 @@ class UserResource(Resource):
         return user
 
     @jwt_required()
-    @ns.doc("update user's info")
-    @ns.marshal_with(user_model)
-    @ns.expect(user_info_parser)
+    @api.doc("update user's info")
+    @api.marshal_with(user_model)
+    @api.expect(user_info_parser)
     def put(self, user_id: int = None):
         """Updates user's info"""
         if user_id != current_user.id:
@@ -117,8 +114,8 @@ class UserResource(Resource):
         return current_user
 
     @jwt_required()
-    @ns.doc("delete user's own account")
-    @ns.expect(
+    @api.doc("delete user's own account")
+    @api.expect(
         user_login_parser.copy()
         .replace_argument(
             "username",
@@ -153,10 +150,10 @@ class UserResource(Resource):
 
 
 class Login(Resource):
-    @ns.doc("login user")
-    @ns.response(200, "Successful login", model=user_model)
-    @ns.response(404, "Invalid url")
-    @ns.expect(user_login_parser)
+    @api.doc("login user")
+    @api.response(200, "Successful login", model=user_model)
+    @api.response(404, "Invalid url")
+    @api.expect(user_login_parser)
     def post(self):
         """User's login view"""
         args = user_login_parser.parse_args()
@@ -185,19 +182,19 @@ class Login(Resource):
         return response
 
 
-@ns.param("user_id", "user's id", type=int)
-@ns.param("slug", "session's slug", type=str)
+@api.param("user_id", "user's id", type=int)
+@api.param("slug", "session's slug", type=str)
 class UserSession(Resource):
     @jwt_required()
-    @ns.response(200, "User session", model=session_model)
-    @ns.marshal_with(session_model)
+    @api.response(200, "User session", model=session_model)
+    @api.marshal_with(session_model)
     def get(self, user_id: int, slug: str):
         if current_user.id != user_id and not g.identity.provides(RoleNeed("admin")):
             raise InvalidUsage.user_not_authorized()
         return Session.get(slug=slug, user_id=user_id)
 
     @jwt_required()
-    @ns.marshal_with(session_model)
+    @api.marshal_with(session_model)
     def delete(self, user_id: int, slug: str):
         if current_user.id != user_id and not g.identity.provides(RoleNeed("admin")):
             raise InvalidUsage.user_not_authorized()
@@ -207,11 +204,11 @@ class UserSession(Resource):
         return
 
 
-@ns.param("user_id", "user's id", type=int)
+@api.param("user_id", "user's id", type=int)
 class UserSessions(Resource):
     @jwt_required()
-    @ns.expect(offset_parser)
-    @ns.serialize_multi(session_model, Session, description="User's Active Sessions")
+    @api.expect(offset_parser)
+    @api.serialize_multi(session_model, Session, description="User's Active Sessions")
     def get(self, user_id: int = None):
         """Gets a list of user's active sessions"""
         args = offset_parser.parse_args()
@@ -229,7 +226,7 @@ class UserSessions(Resource):
         return user_sessions
 
     @jwt_required()
-    @ns.serialize_multi(session_model, Session, description="User's Active Sessions")
+    @api.serialize_multi(session_model, Session, description="User's Active Sessions")
     def delete(self, user_id: int = None, slug: str = None):
         """Invalidates all users sessions except the current sessions"""
         user = User.get(id=user_id)
@@ -252,15 +249,15 @@ class UserSessions(Resource):
         ]
 
 
-ns.add_resource(UsersResource, "/users/")
-ns.add_resource(Login, "/users/login")
-ns.add_resource(UserResource, "/users/<int:user_id>", endpoint="user")
-ns.add_resource(
+api.add_resource(UsersResource, "/users/")
+api.add_resource(Login, "/users/login")
+api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user")
+api.add_resource(
     UserSessions,
     "/users/<int:user_id>/sessions",
     endpoint="sessions",
 )
-ns.add_resource(
+api.add_resource(
     UserSession,
     "/users/<int:user_id>/sessions/<slug>",
     endpoint="single_session",

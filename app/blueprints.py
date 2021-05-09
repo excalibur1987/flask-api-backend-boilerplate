@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from app.apis.v1.blueprint import api_v1
+from app.apis.v1 import api_v1
 
 if TYPE_CHECKING:
     from app.utils import ExtendedFlask
@@ -18,6 +18,6 @@ def register_blueprints(app: "ExtendedFlask") -> "ExtendedFlask":
     Returns:
         Flask: Flask Application instance
     """
-    app.register_blueprint(api_v1)
+    api_v1.init_app(app)
 
     return app
