@@ -1,3 +1,4 @@
+from app.utils import UrlWArgs
 from flask_jwt_extended.utils import get_jwt
 from flask_restx import fields
 
@@ -33,7 +34,10 @@ session_serializer = {
         attribute=lambda session_: session_.token == get_jwt().get("jti", None),
         description="If this is the current active sessions",
     ),
-    "url": fields.Url(
-        ".sessions", slug=".slug", absolute=True, description="Session endpoint"
+    "url": UrlWArgs(
+        endpoint=".single_session",
+        user_id=".user_id",
+        slug=".slug",
+        description="Session endpoint",
     ),
 }
