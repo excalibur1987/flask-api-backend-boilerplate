@@ -22,14 +22,13 @@ from sqlalchemy.sql.expression import or_
 from sqlalchemy.sql.functions import func
 
 from app.database import db
-from app.exceptions import InvalidUsage
+from app.exceptions import InvalidUsage, UserExceptions
 from app.utils import g
 from app.utils.decorators import has_roles
 from app.utils.extended_objects import ExtendedNameSpace
 from app.utils.file_storage import FileStorage
 from app.utils.parsers import offset_parser
 
-from .exceptions import UserExceptions
 from .models import Session, User
 from .parsers import user_info_parser, user_login_parser, user_parser
 from .serializers import session_serializer, user_serializer
