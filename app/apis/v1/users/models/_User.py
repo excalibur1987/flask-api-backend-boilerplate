@@ -9,12 +9,11 @@ from sqlalchemy.sql.sqltypes import BOOLEAN, String
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.database import BaseModel, db
+from app.exceptions import UserExceptions
 from app.utils.file_storage import FileStorage
 
-from ..exceptions import UserExceptions
-
 if TYPE_CHECKING:
-    from ._Role import Role
+    from ...roles.models import Role
     from ._Session import Session
 
     hybrid_property = property

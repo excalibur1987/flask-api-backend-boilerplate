@@ -29,6 +29,8 @@ class UserRoles(BaseModel):
         ),
     )
 
-    def __init__(self, user: "User", role: "Role") -> None:
-        self.user_id = user.id
+    def __init__(
+        self, user: "User" = None, role: "Role" = None, user_id: int = None
+    ) -> None:
+        self.user_id = user_id or user.id
         self.role_id = role.id

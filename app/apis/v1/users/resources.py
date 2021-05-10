@@ -68,7 +68,7 @@ class UsersResource(Resource):
         args = user_parser.parse_args()
 
         user = User(**args)
-
+        user.save(True)
         return user
 
 
@@ -250,16 +250,16 @@ class UserSessions(Resource):
         ]
 
 
-api.add_resource(UsersResource, "/users/")
-api.add_resource(Login, "/users/login")
-api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user")
+api.add_resource(UsersResource, "/")
+api.add_resource(Login, "/login")
+api.add_resource(UserResource, "/<int:user_id>", endpoint="user")
 api.add_resource(
     UserSessions,
-    "/users/<int:user_id>/sessions",
+    "/<int:user_id>/sessions",
     endpoint="sessions",
 )
 api.add_resource(
     UserSession,
-    "/users/<int:user_id>/sessions/<slug>",
+    "/<int:user_id>/sessions/<slug>",
     endpoint="single_session",
 )
