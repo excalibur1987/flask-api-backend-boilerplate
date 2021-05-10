@@ -4,6 +4,7 @@ flake8
 black
 isort
 pytest
+coveralls
 sqlalchemy-stubs
 python-dotenv
 git+https://github.com/ssfdust/flask-sqlalchemy-stubs.git
