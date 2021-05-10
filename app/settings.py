@@ -70,6 +70,11 @@ class DevConfig(Config):
     SESSION_COOKIE_SECURE = False
 
 
+class TestConfig(DevConfig):
+
+    TESTING = True
+
+
 class ProdConfig(Config):
 
     SESSION_COOKIE_SECURE = True
