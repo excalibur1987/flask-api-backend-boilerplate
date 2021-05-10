@@ -28,7 +28,10 @@ def upgrade():
         sa.Column("id", sa.INTEGER(), nullable=False),
         sa.Column("username", sa.String(), nullable=False),
         sa.Column(
-            "is_active", sa.BOOLEAN(), server_default=sa.text("1::bool"), nullable=False
+            "is_active",
+            sa.BOOLEAN(),
+            server_default=sa.cast(1, sa.BOOLEAN()),
+            nullable=False,
         ),
         sa.Column("password", sa.String(), server_default="", nullable=False),
         sa.Column("email", sa.String(), nullable=True),
