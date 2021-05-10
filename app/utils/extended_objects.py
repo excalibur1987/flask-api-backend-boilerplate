@@ -1,9 +1,10 @@
 from functools import wraps
 from typing import Callable, List, Union
 
-from app.database import BaseModel
 from flask_restx import Model, OrderedModel, fields
 from flask_restx.namespace import Namespace
+
+from app.database import BaseModel
 
 from .parsers import offset_parser
 

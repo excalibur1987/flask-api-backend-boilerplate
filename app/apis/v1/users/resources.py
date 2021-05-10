@@ -1,13 +1,6 @@
 from typing import Dict, List
 
 import werkzeug
-from app.database import db
-from app.exceptions import InvalidUsage
-from app.utils import g
-from app.utils.decorators import has_roles
-from app.utils.extended_objects import ExtendedNameSpace
-from app.utils.file_storage import FileStorage
-from app.utils.parsers import offset_parser
 from flask import jsonify, request
 from flask.helpers import make_response
 from flask.wrappers import Response
@@ -27,6 +20,14 @@ from flask_principal import RoleNeed
 from flask_restx import Resource, marshal
 from sqlalchemy.sql.expression import or_
 from sqlalchemy.sql.functions import func
+
+from app.database import db
+from app.exceptions import InvalidUsage
+from app.utils import g
+from app.utils.decorators import has_roles
+from app.utils.extended_objects import ExtendedNameSpace
+from app.utils.file_storage import FileStorage
+from app.utils.parsers import offset_parser
 
 from .exceptions import UserExceptions
 from .models import Session, User

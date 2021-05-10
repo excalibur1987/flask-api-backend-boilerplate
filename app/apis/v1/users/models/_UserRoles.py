@@ -6,7 +6,8 @@ from sqlalchemy.sql.sqltypes import INTEGER
 from app.database import BaseModel
 
 if TYPE_CHECKING:
-    from ._Role import Role
+    from app.apis.v1.roles.models._Role import Role
+
     from ._User import User
 
 
