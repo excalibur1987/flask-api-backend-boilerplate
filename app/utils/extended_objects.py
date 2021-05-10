@@ -1,26 +1,12 @@
 from functools import wraps
 from typing import Callable, List, Union
 
-from flask_restx import Api, Model, OrderedModel, fields
+from flask_restx import Model, OrderedModel, fields
 from flask_restx.namespace import Namespace
 
 from app.database import BaseModel
 
 from .parsers import offset_parser
-
-
-class ExtendedApi(Api):
-    def namespace(self, *args, **kwargs):
-        """
-        A namespace factory.
-
-        :returns Namespace: a new namespace instance
-        """
-        kwargs["ordered"] = kwargs.get("ordered", self.ordered)
-        ns = ExtendedNameSpace(*args, **kwargs)
-        self.add_namespace(ns)
-
-        return ns
 
 
 class ExtendedNameSpace(Namespace):

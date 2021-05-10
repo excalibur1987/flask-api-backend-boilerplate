@@ -195,7 +195,7 @@ def add_user_helper() -> "User":
 @with_appcontext
 def add_roles(roles: List[str]):
     """Add roles to be used with users."""
-    from app.apis.v1.users.models import Role
+    from app.apis.v1.roles.models import Role
     from app.database import db
 
     try:
@@ -209,7 +209,7 @@ def add_roles(roles: List[str]):
 @with_appcontext
 def add_superuser():
     """Add Superuser."""
-    from app.apis.v1.users.models import Role
+    from app.apis.v1.roles.models import Role
     from app.database import db
 
     try:
@@ -235,7 +235,7 @@ def add_superuser():
 @with_appcontext
 def add_user():
     """Add User."""
-    from app.apis.v1.users.models import Role
+    from app.apis.v1.roles.models import Role
     from app.database import db
 
     try:

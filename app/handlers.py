@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from flask.app import Flask
+from flask_jwt_extended.exceptions import CSRFError
 from flask_jwt_extended.jwt_manager import JWTManager
 from flask_principal import (
     Identity,
@@ -10,7 +11,7 @@ from flask_principal import (
     identity_loaded,
 )
 
-from app.exceptions import InvalidUsage
+from app.exceptions import InvalidUsage, UserExceptions
 
 if TYPE_CHECKING:
     from app.apis.v1.users.models import User
@@ -62,6 +63,10 @@ def invalid_error_handler(e: InvalidUsage):
     return e.to_json()
 
 
+def invalid_csrf(e: CSRFError):
+    raise UserExceptions.wrong_login_creds()
+
+
 def register_handlers(app: Flask) -> Flask:
     """A function to register global request handlers.
     To register a handler add them like the example
@@ -81,5 +86,6 @@ def register_handlers(app: Flask) -> Flask:
     identity_loaded.connect_via(app)(on_identity_loaded)
 
     app.errorhandler(InvalidUsage)(invalid_error_handler)
+    app.errorhandler(CSRFError)
 
     return app

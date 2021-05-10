@@ -6,7 +6,8 @@ from sqlalchemy.sql.sqltypes import INTEGER
 from app.database import BaseModel
 
 if TYPE_CHECKING:
-    from ._Role import Role
+    from app.apis.v1.roles.models._Role import Role
+
     from ._User import User
 
 
@@ -28,6 +29,8 @@ class UserRoles(BaseModel):
         ),
     )
 
-    def __init__(self, user: "User", role: "Role") -> None:
-        self.user_id = user.id
+    def __init__(
+        self, user: "User" = None, role: "Role" = None, user_id: int = None
+    ) -> None:
+        self.user_id = user_id or user.id
         self.role_id = role.id

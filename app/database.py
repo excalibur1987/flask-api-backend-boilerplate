@@ -34,10 +34,11 @@ T = TypeVar("T")
 class ExtendedModel(Model):
     id = Column(INTEGER, primary_key=True, nullable=False)
 
-    def update(self, **kwargs):
+    def update(self, ignore_none: bool = False, **kwargs):
         for key in kwargs.keys():
-            setattr(self, key, kwargs.get(key))
-        if getattr(self, "updated_at"):
+            if not ignore_none or kwargs.get(key) is not None:
+                setattr(self, key, kwargs.get(key))
+        if hasattr(self, "updated_at"):
             self.updated_at = datetime.now(tz=current_app.config["TZ"])
         db.session.commit()
 

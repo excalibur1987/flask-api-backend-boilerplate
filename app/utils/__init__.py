@@ -2,10 +2,9 @@ from flask import g
 from flask_principal import Identity
 
 from .decorators import has_roles
-from .extended_flask import ExtendedFlask
+from .extended_objects import ExtendedNameSpace
 from .file_storage import FileStorage
-from .helpers import chain, create_api
-from .parent_blueprint import ParentBP
+from .helpers import chain
 from .url_w_args import UrlWArgs
 
 

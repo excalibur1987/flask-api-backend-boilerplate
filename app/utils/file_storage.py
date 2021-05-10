@@ -106,7 +106,7 @@ class FileStorageS3(FileStorageInterface):
         if url:
             self.file_url = url
             self.file_object = self._get_fileobj_fromurl()
-        else:
+        if data:
             self.file_object = self._create_fileobj()
 
     def __repr__(self) -> str:

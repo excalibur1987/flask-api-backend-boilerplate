@@ -38,6 +38,12 @@ user_info_parser.add_argument(
     location="form",
     required=False,
 ).add_argument(
+    "mobile",
+    dest="mobile",
+    type=str,
+    location="form",
+    required=False,
+).add_argument(
     "firstName",
     dest="first_name",
     type=str,

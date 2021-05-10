@@ -1,12 +1,9 @@
-from typing import TYPE_CHECKING
+from flask import Flask
 
-from app.apis.v1.blueprint import api_v1
-
-if TYPE_CHECKING:
-    from app.utils import ExtendedFlask
+from app.apis.v1 import api_v1_bp
 
 
-def register_blueprints(app: "ExtendedFlask") -> "ExtendedFlask":
+def register_blueprints(app: "Flask") -> "Flask":
     """A function to register flask blueprint.
     To register blueprints add them like the example
     Example usage:
@@ -18,6 +15,6 @@ def register_blueprints(app: "ExtendedFlask") -> "ExtendedFlask":
     Returns:
         Flask: Flask Application instance
     """
-    app.register_blueprint(api_v1)
+    app.register_blueprint(api_v1_bp)
 
     return app
