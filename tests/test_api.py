@@ -1,6 +1,7 @@
 import os
 
 import pytest
+from flask.testing import FlaskClient
 
 from app import create_app
 from app.database import db
@@ -25,3 +26,17 @@ def client():
         yield client
 
     os.unlink(db_location)
+
+
+def test_login(client: FlaskClient):
+
+    rv = client.post(
+        "/v1/users/login",
+        data=dict(username=USERS.USER["username"], password=USERS.ADMIN["password"]),
+    )
+
+    res_json = rv.get_json()
+
+    assert (
+        res_json["username"].lower() == USERS.USER["username"] and "token" in res_json
+    )
