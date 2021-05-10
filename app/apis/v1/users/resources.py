@@ -11,17 +11,14 @@ from app.utils.parsers import offset_parser
 from flask import jsonify, request
 from flask.helpers import make_response
 from flask.wrappers import Response
-from flask_jwt_extended import (
-    current_user,
-    jwt_required,
-    set_access_cookies,
-    unset_jwt_cookies,
-)
+from flask_jwt_extended import current_user, jwt_required
 from flask_jwt_extended.utils import (
     create_access_token,
     get_csrf_token,
     get_jti,
     get_jwt,
+    set_access_cookies,
+    unset_jwt_cookies,
 )
 from flask_principal import RoleNeed
 from flask_restx import Resource, marshal
@@ -148,6 +145,20 @@ class UserResource(Resource):
         return response
 
 
+class Logout(Resource):
+    @api.doc("logout user and invalidate session")
+    def get(self):
+
+        active_session_token = get_jwt()["jti"]
+
+        Session.get(token=active_session_token).delete(True)
+        response: Response = jsonify({"message": "User logged out!"})
+        response.delete_cookie("csrftoken")
+        unset_jwt_cookies(response)
+
+        return response
+
+
 class Login(Resource):
     @api.doc("login user")
     @api.response(200, "Successful login", model=user_model)
@@ -250,6 +261,7 @@ class UserSessions(Resource):
 
 api.add_resource(UsersResource, "/")
 api.add_resource(Login, "/login")
+api.add_resource(Logout, "/logout")
 api.add_resource(UserResource, "/<int:user_id>", endpoint="user")
 api.add_resource(
     UserSessions,
