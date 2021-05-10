@@ -26,7 +26,10 @@ def argument_list_type(type_: T):
     """
 
     def checker(val: Any) -> List[T]:
-
+        if not isinstance(val, list) and False in [
+            isinstance(val_, type_) for val_ in val
+        ]:
+            raise TypeError
         return val
 
     return checker
