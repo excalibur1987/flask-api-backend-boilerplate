@@ -1,11 +1,12 @@
+from flask_jwt_extended import jwt_required
+from flask_restx import Resource, fields
+from flask_restx.reqparse import RequestParser
+
 from app.database import db
 from app.exceptions import InvalidUsage
 from app.utils.decorators import has_roles
 from app.utils.extended_objects import ExtendedNameSpace
 from app.utils.helpers import argument_list_type
-from flask_jwt_extended import jwt_required
-from flask_restx import Resource, fields
-from flask_restx.reqparse import RequestParser
 
 from ..users.models import User, UserRoles
 from ..users.resources import user_model
