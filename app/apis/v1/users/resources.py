@@ -1,6 +1,13 @@
 from typing import Dict, List
 
 import werkzeug
+from app.database import db
+from app.exceptions import InvalidUsage, UserExceptions
+from app.utils import g
+from app.utils.decorators import has_roles
+from app.utils.extended_objects import ExtendedNameSpace
+from app.utils.file_storage import FileStorage
+from app.utils.parsers import offset_parser
 from flask import jsonify, request
 from flask.helpers import make_response
 from flask.wrappers import Response
@@ -21,15 +28,6 @@ from flask_restx import Resource, marshal
 from sqlalchemy.sql.expression import or_
 from sqlalchemy.sql.functions import func
 
-from app.database import db
-from app.exceptions import InvalidUsage
-from app.utils import g
-from app.utils.decorators import has_roles
-from app.utils.extended_objects import ExtendedNameSpace
-from app.utils.file_storage import FileStorage
-from app.utils.parsers import offset_parser
-
-from .exceptions import UserExceptions
 from .models import Session, User
 from .parsers import user_info_parser, user_login_parser, user_parser
 from .serializers import session_serializer, user_serializer
@@ -68,7 +66,7 @@ class UsersResource(Resource):
         args = user_parser.parse_args()
 
         user = User(**args)
-
+        user.save(True)
         return user
 
 
@@ -250,16 +248,16 @@ class UserSessions(Resource):
         ]
 
 
-api.add_resource(UsersResource, "/users/")
-api.add_resource(Login, "/users/login")
-api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user")
+api.add_resource(UsersResource, "/")
+api.add_resource(Login, "/login")
+api.add_resource(UserResource, "/<int:user_id>", endpoint="user")
 api.add_resource(
     UserSessions,
-    "/users/<int:user_id>/sessions",
+    "/<int:user_id>/sessions",
     endpoint="sessions",
 )
 api.add_resource(
     UserSession,
-    "/users/<int:user_id>/sessions/<slug>",
+    "/<int:user_id>/sessions/<slug>",
     endpoint="single_session",
 )
