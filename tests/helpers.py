@@ -1,10 +1,10 @@
 from typing import Any, List, TypedDict
 
+from flask.testing import FlaskClient
+
 from app.apis.v1.roles.models import Role
 from app.apis.v1.users.models import User
 from app.database import db
-from flask.testing import FlaskClient
-from werkzeug.http import parse_cookie
 
 
 class UserDict(TypedDict):
@@ -55,36 +55,3 @@ class ExtendedClient(FlaskClient):
     def open(self, *args, **kw):
         kw["headers"] = {**kw.get("headers", {}), **{"X-CSRF-TOKEN": self.csrf}}
         return super(ExtendedClient, self).open(*args, **kw)
-
-
-def user_login(
-    client: FlaskClient, user: UserDict = None, token: str = None
-) -> ExtendedClient:
-
-    if user:
-        rv = client.post(
-            "/v1/users/login",
-            data=dict(username=user["username"], password=user["password"]),
-        )
-        token = rv.get_json().get("token")
-        cookie = next(
-            (
-                cookie
-                for cookie in rv.headers.getlist("Set-Cookie")
-                if "access_token_cookie" in cookie
-            ),
-            None,
-        )
-        cookie_attrs = parse_cookie(cookie)
-
-        client.set_cookie(
-            server_name="/",
-            key="access_token_cookie",
-            httponly=True,
-            secure=False,
-            value=cookie_attrs["access_token_cookie"],
-        )
-    client.csrf = token
-    client.__class__ = ExtendedClient
-
-    return client

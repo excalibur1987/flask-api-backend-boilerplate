@@ -2,10 +2,12 @@ import os
 from typing import List, TypedDict
 
 import pytest
+from flask.app import Flask
+from flask.testing import FlaskClient
+
 from app import create_app
 from app.database import db
 from app.settings import TestConfig
-from flask.testing import FlaskClient
 
 from .helpers import ExtendedClient, create_user
 
@@ -25,102 +27,61 @@ class UserDict(TypedDict):
     roles: List[str]
 
 
-def get_test_app(DB_URI):
+@pytest.fixture()
+def db_location():
+    loc = os.path.join(os.getcwd(), "tests", "test_db.db")
+    if not os.path.exists(loc):
+        open(loc, "w")
+    yield loc
+    os.unlink(loc)
+
+
+@pytest.fixture()
+def db_uri(db_location):
+    return f"sqlite:////{db_location}"
+
+
+@pytest.fixture()
+def test_app(db_uri: str):
     """factory to return test app
 
     Args:
-        DB_URI ([type]): database uri
+        db_uri ([type]): database uri
 
     Returns:
         Flask instance: flask instance with test config
     """
     app = create_app(TestConfig)
-    app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     return app
 
 
-@pytest.fixture(scope="session")
-def client(admin_user: UserDict, site_user: UserDict):
-    DB_LOCATION = os.path.join(os.getcwd(), "tests", "test_db.db")
-    DB_URI = f"sqlite:////{DB_LOCATION}"
-    if not os.path.exists(DB_LOCATION):
-        open(DB_LOCATION, "w")
+@pytest.fixture()
+def client(admin_user: UserDict, site_user: UserDict, test_app: Flask):
+    users = {"admin": admin_user, "user": site_user}
 
-    app = get_test_app(DB_URI)
-
-    with app.test_client() as client:
+    with test_app.test_client() as client:
         client: FlaskClient
-        with app.app_context():
+        with test_app.app_context():
             db.create_all()
             for user in [admin_user, site_user]:
                 create_user(user)
-            yield client
 
-    os.unlink(DB_LOCATION)
+            def login_client(user: str = None):
+                if user is not None:
+                    response = client.post(
+                        "/v1/users/login",
+                        data=dict(
+                            username=users["admin"]["username"],
+                            password=users["admin"]["password"],
+                        ),
+                    )
+                    token = response.get_json().get("token")
+                    client.csrf = token
+                    client.__class__ = ExtendedClient
+                return client
 
-
-@pytest.fixture(scope="session")
-def admin_client(admin_user: UserDict, site_user: UserDict):
-    DB_LOCATION = os.path.join(os.getcwd(), "tests", "test_db.db")
-    DB_URI = f"sqlite:////{DB_LOCATION}"
-    if not os.path.exists(DB_LOCATION):
-        open(DB_LOCATION, "w")
-
-    app = get_test_app(DB_URI)
-
-    with app.test_client() as client:
-        client: ExtendedClient
-        with app.app_context():
-            db.create_all()
-            users = {"admin": admin_user, "user": site_user}
-            for user in users.values():
-                create_user(user)
-            response = client.post(
-                "/v1/users/login",
-                data=dict(
-                    username=users["admin"]["username"],
-                    password=users["admin"]["password"],
-                ),
-            )
-            token = response.get_json().get("token")
-
-            client.csrf = token
-            client.__class__ = ExtendedClient
-            yield client
-
-    os.unlink(DB_LOCATION)
-
-
-@pytest.fixture(scope="session")
-def user_client(admin_user: UserDict, site_user: UserDict):
-    DB_LOCATION = os.path.join(os.getcwd(), "tests", "test_db.db")
-    DB_URI = f"sqlite:////{DB_LOCATION}"
-    if not os.path.exists(DB_LOCATION):
-        open(DB_LOCATION, "w")
-
-    app = get_test_app(DB_URI)
-
-    with app.test_client() as client:
-        client: ExtendedClient
-        with app.app_context():
-            db.create_all()
-            users = {"admin": admin_user, "user": site_user}
-            for user in users.values():
-                create_user(user)
-            response = client.post(
-                "/v1/users/login",
-                data=dict(
-                    username=users["user"]["username"],
-                    password=users["user"]["password"],
-                ),
-            )
-            token = response.get_json().get("token")
-
-            client.csrf = token
-            client.__class__ = ExtendedClient
-            yield client
-
-    os.unlink(DB_LOCATION)
+            return login_client
 
 
 @pytest.fixture(scope="session")
