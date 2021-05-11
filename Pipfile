@@ -1,0 +1,36 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+gunicorn = "*"
+flask-restx = "*"
+psycopg2-binary = "*"
+boto3 = "*"
+Flask = "*"
+SQLAlchemy = "*"
+Flask-SQLAlchemy = "*"
+SQLAlchemy-Utils = "*"
+Flask-Script = "*"
+Flask-Principal = "*"
+Flask-Migrate = "*"
+Flask-JWT-Extended = "*"
+
+[dev-packages]
+flake8 = "*"
+black = "*"
+isort = "*"
+pytest = "*"
+sqlalchemy-stubs = "*"
+python-dotenv = "*"
+pre-commit = "*"
+boto3-stubs = "*"
+pytest-cov = "*"
+flask-sqlalchemy-stubs = {git = "https://github.com/ssfdust/flask-sqlalchemy-stubs.git"}
+
+[requires]
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
