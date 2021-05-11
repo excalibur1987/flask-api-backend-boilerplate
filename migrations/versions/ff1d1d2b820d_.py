@@ -26,6 +26,7 @@ def upgrade():
         sa.Column("platform", sa.String(), nullable=True),
         sa.Column("browser", sa.String(), nullable=True),
         sa.Column("active", sa.BOOLEAN(), nullable=False),
+        sa.Column("slug", sa.String(), nullable=False),
         sa.Column("created_at", sa.TIMESTAMP(timezone=True), nullable=False),
         sa.ForeignKeyConstraint(
             ["user_id"],

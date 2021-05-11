@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, List, Union
 
 from flask import current_app
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.expression import text
+from sqlalchemy.sql.expression import cast
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import BOOLEAN, String
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -36,7 +36,7 @@ class User(BaseModel):
     __tablename__ = "users"
     username = Column(String, nullable=False)
     active = Column(
-        "is_active", BOOLEAN(), nullable=False, server_default=text("1::bool")
+        "is_active", BOOLEAN(), nullable=False, server_default=cast(1, BOOLEAN)
     )
 
     _password = Column("password", String, nullable=False, server_default="")
@@ -92,6 +92,7 @@ class User(BaseModel):
         last_name: str = "",
         first_name_ar: str = "",
         last_name_ar: str = "",
+        **kwargs,
     ) -> None:
         if password != password_check:
             raise UserExceptions.password_check_invalid()

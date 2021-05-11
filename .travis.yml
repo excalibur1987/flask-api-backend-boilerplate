@@ -1,0 +1,4 @@
+language: python
+install: pip install --user -r requirements/development.txt
+# command to run tests
+script: pytest
