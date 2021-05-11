@@ -2,12 +2,10 @@ import os
 from typing import List, TypedDict
 
 import pytest
-from flask.testing import FlaskClient
-from werkzeug.http import parse_cookie
-
 from app import create_app
 from app.database import db
 from app.settings import TestConfig
+from flask.testing import FlaskClient
 
 from .helpers import ExtendedClient, create_user
 
@@ -85,23 +83,7 @@ def admin_client(admin_user: UserDict, site_user: UserDict):
                 ),
             )
             token = response.get_json().get("token")
-            cookie = next(
-                (
-                    cookie
-                    for cookie in response.headers.getlist("Set-Cookie")
-                    if "access_token_cookie" in cookie
-                ),
-                None,
-            )
-            cookie_attrs = parse_cookie(cookie)
 
-            client.set_cookie(
-                server_name="/",
-                key="access_token_cookie",
-                httponly=True,
-                secure=False,
-                value=cookie_attrs["access_token_cookie"],
-            )
             client.csrf = token
             client.__class__ = ExtendedClient
             yield client
@@ -133,23 +115,7 @@ def user_client(admin_user: UserDict, site_user: UserDict):
                 ),
             )
             token = response.get_json().get("token")
-            cookie = next(
-                (
-                    cookie
-                    for cookie in response.headers.getlist("Set-Cookie")
-                    if "access_token_cookie" in cookie
-                ),
-                None,
-            )
-            cookie_attrs = parse_cookie(cookie)
 
-            client.set_cookie(
-                server_name="/",
-                key="access_token_cookie",
-                httponly=True,
-                secure=False,
-                value=cookie_attrs["access_token_cookie"],
-            )
             client.csrf = token
             client.__class__ = ExtendedClient
             yield client
