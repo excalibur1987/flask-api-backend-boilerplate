@@ -1,10 +1,10 @@
-from typing import Any, TypedDict
-
-from flask.testing import FlaskClient
+from typing import Any, List, TypedDict
 
 from app.apis.v1.roles.models import Role
-from app.apis.v1.users.models import User, UserRoles
+from app.apis.v1.users.models import User
 from app.database import db
+from flask.testing import FlaskClient
+from werkzeug.http import parse_cookie
 
 
 class UserDict(TypedDict):
@@ -19,55 +19,31 @@ class UserDict(TypedDict):
     last_name: str
     first_name_ar: str
     last_name_ar: str
+    roles: List[str]
 
 
-class USERS(object):
-    ADMIN: UserDict = {
-        "username": "admin_user",
-        "password": "123456",
-        "password_check": "123456",
-        "email": "john.doe@example.com",
-        "mobile": "+12345678910",
-        "first_name": "john",
-        "last_name": "doe",
-    }
-    USER: UserDict = {
-        "username": "test_user",
-        "password": "123456",
-        "password_check": "123456",
-        "email": "jane.doe@example.com",
-        "mobile": "+12345678910",
-        "first_name": "jane",
-        "last_name": "doe",
-    }
+def create_user(user_info: UserDict):
+    if User.get(username=user_info.get("username")):
+        return
 
-    @classmethod
-    def create_admin(cls):
-        user = User(**cls.ADMIN)
+    role_names = user_info.get("roles")
 
-        admin_role = Role("admin", "Admin Role")
+    roles = [Role(role.lower(), f"{role.title()} Role") for role in role_names]
 
-        db.session.add_all([user, admin_role])
+    user = User(**user_info)
 
-        db.session.flush()
+    db.session.add_all(
+        [
+            user,
+        ]
+        + roles
+    )
 
-        db.session.add(UserRoles(user=user, role=admin_role))
+    db.session.flush()
 
-        db.session.commit()
+    user.add_roles(roles)
 
-    @classmethod
-    def create_user(cls):
-        user = User(**cls.USER)
-
-        user_role = Role("user", "User Role")
-
-        db.session.add_all([user, user_role])
-
-        db.session.flush()
-
-        db.session.add(UserRoles(user=user, role=user_role))
-
-        db.session.commit()
+    db.session.commit()
 
 
 class ExtendedClient(FlaskClient):
@@ -77,39 +53,38 @@ class ExtendedClient(FlaskClient):
         self.csrf = csrf
 
     def open(self, *args, **kw):
-        kw["headers"].update("X-CSRF-TOKEN", self.csrf)
+        kw["headers"] = {**kw.get("headers", {}), **{"X-CSRF-TOKEN": self.csrf}}
         return super(ExtendedClient, self).open(*args, **kw)
 
 
-def admin_login(client: FlaskClient):
+def user_login(
+    client: FlaskClient, user: UserDict = None, token: str = None
+) -> ExtendedClient:
 
-    USERS.create_admin()
+    if user:
+        rv = client.post(
+            "/v1/users/login",
+            data=dict(username=user["username"], password=user["password"]),
+        )
+        token = rv.get_json().get("token")
+        cookie = next(
+            (
+                cookie
+                for cookie in rv.headers.getlist("Set-Cookie")
+                if "access_token_cookie" in cookie
+            ),
+            None,
+        )
+        cookie_attrs = parse_cookie(cookie)
 
-    rv = client.post(
-        "/v1/users/login",
-        data=dict(username=USERS.ADMIN["username"], password=USERS.ADMIN["password"]),
-    )
-
-    csrf_token = rv.get_json().get("token")
-
+        client.set_cookie(
+            server_name="/",
+            key="access_token_cookie",
+            httponly=True,
+            secure=False,
+            value=cookie_attrs["access_token_cookie"],
+        )
+    client.csrf = token
     client.__class__ = ExtendedClient
-
-    client.csrf = csrf_token
-
-    return client
-
-
-def user_login(client: FlaskClient):
-    USERS.create_user()
-    rv = client.post(
-        "/v1/users/login",
-        data=dict(username=USERS.USER["username"], password=USERS.ADMIN["password"]),
-    )
-
-    csrf_token = rv.get_json().get("token")
-
-    client.__class__ = ExtendedClient
-
-    client.csrf = csrf_token
 
     return client
