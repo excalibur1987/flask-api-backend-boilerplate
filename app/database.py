@@ -9,9 +9,9 @@ from sqlalchemy import Column, and_, text
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.mutable import Mutable
-from sqlalchemy.sql.expression import or_
+from sqlalchemy.sql.expression import cast, or_
 from sqlalchemy.sql.schema import ForeignKey, MetaData
-from sqlalchemy.sql.sqltypes import INTEGER, Boolean, DateTime, String
+from sqlalchemy.sql.sqltypes import BOOLEAN, INTEGER, Boolean, DateTime, String
 
 from app.exceptions import InvalidUsage
 
@@ -123,7 +123,7 @@ class DatedModel(object):
 
 class CancelableModel(object):
 
-    cancelled = Column(Boolean, nullable=False, server_default=text("false::boolean"))
+    cancelled = Column(Boolean, nullable=False, server_default=cast(0, BOOLEAN))
     date_cancelled = Column(DateTime(True), nullable=True)
 
     @declared_attr

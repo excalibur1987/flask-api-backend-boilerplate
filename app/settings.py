@@ -28,7 +28,7 @@ class Config(object):
     # Regex rule to check against user's password
     PASSWORD_RULE = os.getenv("PASSWORD_RULE", ".*")
     # Storage target to handle file storage
-    STORAGE_TARGET = os.getenv("STORAGE_TARGET")
+    STORAGE_TARGET = os.getenv("STORAGE_TARGET", "s3")
 
     # Sqlalchemy Configuration
     DATABASE_URL = os.getenv("DATABASE_URL")
@@ -68,6 +68,11 @@ class DevConfig(Config):
     SECRET_KEY = "secretkey"
     JWT_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
+
+
+class TestConfig(DevConfig):
+
+    TESTING = True
 
 
 class ProdConfig(Config):

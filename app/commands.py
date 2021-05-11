@@ -63,7 +63,7 @@ def lint(fix_imports):
         if rv != 0:
             exit(rv)
 
-    execute_tool("Formatting Files", "black", targets=["."])
+    execute_tool("Formatting Files", "black", "--exclude", "env", targets=["."])
     if fix_imports:
         execute_tool(
             "Fixing import order", "isort", "--profile", "black", targets=["."]

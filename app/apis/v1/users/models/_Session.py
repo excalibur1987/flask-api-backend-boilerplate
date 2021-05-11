@@ -35,5 +35,5 @@ class Session(BaseModel):
         self.ip_address = ip_address
         self.platform = platform
         self.browser = browser
-        self.slug = uuid.uuid4()
+        self.slug = str(uuid.uuid4())
         self.created_at = datetime.now(tz=current_app.config["TZ"])
