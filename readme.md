@@ -1,5 +1,7 @@
 # Backend API boilerplate
 
+[![Build Status](https://travis-ci.com/excalibur1987/flask-api-backend-boilerplate.svg?branch=master)](https://travis-ci.com/excalibur1987/flask-api-backend-boilerplate)
+
 This is the backend api boilerplate to be used with other frontend apps.
 
 ## This boilerplate is built using the following dependencies
