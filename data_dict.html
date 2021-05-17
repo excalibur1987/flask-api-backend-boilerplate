@@ -5,12 +5,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-      h1 {
-        text-decoration: underline;
+      body {
+        padding: 0 2rem;
+        border: 1px ridge #000;
+      }
+      h1.title{
+        margin: auto;
+        width: 50%;
+      }
+      .sql-table-contianer h2 {
+        border-bottom: 2px solid black;
+        width: max-content;
+        padding: 0 0 0.5rem 0;
+      }
+      .sql-table-contianer sub {
+        font-size: small;
       }
       table {
         border-collapse: collapse;
-        margin: 1rem;
+        margin-top: 1rem;
       }
       table * {
         text-align: start;
@@ -28,357 +41,495 @@
       tbody td {
         padding: 0.5rem;
       }
+      pre {
+        background-color: gray;
+        padding: 0.5rem;
+        color: #fff;
+        width: max-content;
+        border-radius: 10px;
+        font-size: large;
+      }
+      .sql-table-contianer {
+        border-bottom: 3px solid #000000;
+        padding-bottom: 1.5rem;
+      }
     </style>
     <title>Data Dictionary</title>
   </head>
   <body>
-    <h1>roles</h1>
-    <p>
-      <b>Sqlalchemy Model:</b
-      ><a href="app/apis/v1/roles/models/_Role.py">Role</a>
-    </p>
-    <div class="wrapper">
-      <h2>Description:</h2>
-      <p>None</p>
+    <h1 class="title">Data Dictionary</h1>
+    
+    <div class="sql-table-contianer">
+      <h2>
+        roles
+        <sub>Table</sub>
+      </h2>
+
+      <p>
+        <b>Sqlalchemy Model:</b
+        ><a href="app/apis/v1/roles/models/_Role.py"
+          >Role</a
+        >
+      </p>
+      <div class="wrapper">
+        <h2>Description:</h2>
+        <p>None</p>
+      </div>
+      
+      <table class="col-details">
+        <thead>
+          <th>Database Field Name</th>
+          <th>Data Type</th>
+          <th>Description</th>
+          <th>Primary/Foreign</th>
+        </thead>
+        <tbody>
+           
+          <tr>
+            <td>id</td>
+            <td>INTEGER</td>
+            <td>Unique row identifier</td>
+            <td>
+              Primary
+            </td>
+          </tr>
+          
+          <tr>
+            <td>name</td>
+            <td>VARCHAR</td>
+            <td>None</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>description</td>
+            <td>VARCHAR</td>
+            <td>None</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+      <table class="table-constraints">
+        <thead>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Columns</th>
+        </thead>
+        <tbody>
+           
+          <tr>
+            
+            <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
+            
+            <td rowspan="1" colspan="1">
+              pk_roles
+            </td>
+            <td colspan="1">id</td>
+          </tr>
+           
+        </tbody>
+      </table>
     </div>
-    <table class="col-details">
-      <thead>
-        <th>Database Field Name</th>
-        <th>Data Type</th>
-        <th>Description</th>
-        <th>Primary/Foreign</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td>id</td>
-          <td>INTEGER</td>
-          <td>Unique row identifier</td>
-          <td>Primary</td>
-        </tr>
+    
+    <div class="sql-table-contianer">
+      <h2>
+        sessions
+        <sub>Table</sub>
+      </h2>
 
-        <tr>
-          <td>name</td>
-          <td>VARCHAR</td>
-          <td>None</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>description</td>
-          <td>VARCHAR</td>
-          <td>None</td>
-          <td>N/A</td>
-        </tr>
-      </tbody>
-    </table>
-    <table class="table-constraints">
-      <thead>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Columns</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
-
-          <td rowspan="1" colspan="1">pk_roles</td>
-          <td colspan="1">id</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h1>sessions</h1>
-    <p>
-      <b>Sqlalchemy Model:</b
-      ><a href="app/apis/v1/users/models/_Session.py">Session</a>
-    </p>
-    <div class="wrapper">
-      <h2>Description:</h2>
-      <p>table for user&#39;s active sessions</p>
+      <p>
+        <b>Sqlalchemy Model:</b
+        ><a href="app/apis/v1/users/models/_Session.py"
+          >Session</a
+        >
+      </p>
+      <div class="wrapper">
+        <h2>Description:</h2>
+        <p>table for user&#39;s active sessions</p>
+      </div>
+      
+      <table class="col-details">
+        <thead>
+          <th>Database Field Name</th>
+          <th>Data Type</th>
+          <th>Description</th>
+          <th>Primary/Foreign</th>
+        </thead>
+        <tbody>
+           
+          <tr>
+            <td>id</td>
+            <td>INTEGER</td>
+            <td>Unique row identifier</td>
+            <td>
+              Primary
+            </td>
+          </tr>
+          
+          <tr>
+            <td>user_id</td>
+            <td>INTEGER</td>
+            <td>user&#39;s table foreign key</td>
+            <td>
+              Foreign
+            </td>
+          </tr>
+          
+          <tr>
+            <td>token</td>
+            <td>VARCHAR</td>
+            <td>session&#39;s token</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>ip_address</td>
+            <td>VARCHAR</td>
+            <td>machine&#39;s ip address</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>platform</td>
+            <td>VARCHAR</td>
+            <td>machine&#39;s os platform</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>browser</td>
+            <td>VARCHAR</td>
+            <td>registered browser</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>active</td>
+            <td>BOOLEAN</td>
+            <td>None</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>slug</td>
+            <td>VARCHAR</td>
+            <td>unique&#39;s slug identifier</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>created_at</td>
+            <td>TIMESTAMP</td>
+            <td>session&#39;s creation date</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+      <table class="table-constraints">
+        <thead>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Columns</th>
+        </thead>
+        <tbody>
+           
+          <tr>
+            
+            <td rowspan="1" colspan="1">ForeignKeyConstraint</td>
+            
+            <td rowspan="1" colspan="1">
+              fk_sessions_user_id_users
+            </td>
+            <td colspan="1">user_id</td>
+          </tr>
+            
+          <tr>
+            
+            <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
+            
+            <td rowspan="1" colspan="1">
+              pk_sessions
+            </td>
+            <td colspan="1">id</td>
+          </tr>
+            
+          <tr>
+            
+            <td rowspan="1" colspan="1">UniqueConstraint</td>
+            
+            <td rowspan="1" colspan="1">
+              uq_sessions_slug
+            </td>
+            <td colspan="1">slug</td>
+          </tr>
+           
+        </tbody>
+      </table>
     </div>
-    <table class="col-details">
-      <thead>
-        <th>Database Field Name</th>
-        <th>Data Type</th>
-        <th>Description</th>
-        <th>Primary/Foreign</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td>id</td>
-          <td>INTEGER</td>
-          <td>Unique row identifier</td>
-          <td>Primary</td>
-        </tr>
+    
+    <div class="sql-table-contianer">
+      <h2>
+        users
+        <sub>Table</sub>
+      </h2>
 
-        <tr>
-          <td>user_id</td>
-          <td>INTEGER</td>
-          <td>user&#39;s table foreign key</td>
-          <td>Foreign</td>
-        </tr>
-
-        <tr>
-          <td>token</td>
-          <td>VARCHAR</td>
-          <td>session&#39;s token</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>ip_address</td>
-          <td>VARCHAR</td>
-          <td>machine&#39;s ip address</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>platform</td>
-          <td>VARCHAR</td>
-          <td>machine&#39;s os platform</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>browser</td>
-          <td>VARCHAR</td>
-          <td>registered browser</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>active</td>
-          <td>BOOLEAN</td>
-          <td>None</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>slug</td>
-          <td>VARCHAR</td>
-          <td>unique&#39;s slug identifier</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>created_at</td>
-          <td>TIMESTAMP</td>
-          <td>session&#39;s creation date</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>updated_at</td>
-          <td>TIMESTAMP</td>
-          <td>session&#39;s last activity</td>
-          <td>N/A</td>
-        </tr>
-      </tbody>
-    </table>
-    <table class="table-constraints">
-      <thead>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Columns</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td rowspan="1" colspan="1">ForeignKeyConstraint</td>
-
-          <td rowspan="1" colspan="1">fk_sessions_user_id_users</td>
-          <td colspan="1">user_id</td>
-        </tr>
-
-        <tr>
-          <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
-
-          <td rowspan="1" colspan="1">pk_sessions</td>
-          <td colspan="1">id</td>
-        </tr>
-
-        <tr>
-          <td rowspan="1" colspan="1">UniqueConstraint</td>
-
-          <td rowspan="1" colspan="1">uq_sessions_slug</td>
-          <td colspan="1">slug</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h1>users</h1>
-    <p>
-      <b>Sqlalchemy Model:</b
-      ><a href="app/apis/v1/users/models/_User.py">User</a>
-    </p>
-    <div class="wrapper">
-      <h2>Description:</h2>
-      <p>Holds users&#39; data</p>
+      <p>
+        <b>Sqlalchemy Model:</b
+        ><a href="app/apis/v1/users/models/_User.py"
+          >User</a
+        >
+      </p>
+      <div class="wrapper">
+        <h2>Description:</h2>
+        <p>Holds users&#39; data</p>
+      </div>
+      
+      <table class="col-details">
+        <thead>
+          <th>Database Field Name</th>
+          <th>Data Type</th>
+          <th>Description</th>
+          <th>Primary/Foreign</th>
+        </thead>
+        <tbody>
+           
+          <tr>
+            <td>id</td>
+            <td>INTEGER</td>
+            <td>Unique row identifier</td>
+            <td>
+              Primary
+            </td>
+          </tr>
+          
+          <tr>
+            <td>username</td>
+            <td>VARCHAR</td>
+            <td>User&#39;s identifier</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>is_active</td>
+            <td>BOOLEAN</td>
+            <td>Denotes active users</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>password</td>
+            <td>VARCHAR</td>
+            <td>Password hash</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>email</td>
+            <td>VARCHAR</td>
+            <td>User&#39;s personal unique email</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>photo</td>
+            <td>VARCHAR</td>
+            <td>User&#39;s avatar url</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>mobile</td>
+            <td>VARCHAR</td>
+            <td>Contact number</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>first_name</td>
+            <td>VARCHAR</td>
+            <td>First Name</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+          <tr>
+            <td>last_name</td>
+            <td>VARCHAR</td>
+            <td>Last Name</td>
+            <td>
+              N/A
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+      <table class="table-constraints">
+        <thead>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Columns</th>
+        </thead>
+        <tbody>
+           
+          <tr>
+            
+            <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
+            
+            <td rowspan="1" colspan="1">
+              pk_users
+            </td>
+            <td colspan="1">id</td>
+          </tr>
+            
+          <tr>
+            
+            <td rowspan="2" colspan="1">UniqueConstraint</td>
+            
+            <td rowspan="1" colspan="1">
+              uq_users_email
+            </td>
+            <td colspan="1">email</td>
+          </tr>
+          
+          <tr>
+            
+            <td rowspan="1" colspan="1">
+              uq_users_username
+            </td>
+            <td colspan="1">username</td>
+          </tr>
+           
+        </tbody>
+      </table>
     </div>
-    <table class="col-details">
-      <thead>
-        <th>Database Field Name</th>
-        <th>Data Type</th>
-        <th>Description</th>
-        <th>Primary/Foreign</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td>id</td>
-          <td>INTEGER</td>
-          <td>Unique row identifier</td>
-          <td>Primary</td>
-        </tr>
+    
+    <div class="sql-table-contianer">
+      <h2>
+        user_roles
+        <sub>Table</sub>
+      </h2>
 
-        <tr>
-          <td>username</td>
-          <td>VARCHAR</td>
-          <td>User&#39;s identifier</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>is_active</td>
-          <td>BOOLEAN</td>
-          <td>Denotes active users</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>password</td>
-          <td>VARCHAR</td>
-          <td>Password hash</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>email</td>
-          <td>VARCHAR</td>
-          <td>User&#39;s personal unique email</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>photo</td>
-          <td>VARCHAR</td>
-          <td>User&#39;s avatar url</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>mobile</td>
-          <td>VARCHAR</td>
-          <td>Contact number</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>first_name</td>
-          <td>VARCHAR</td>
-          <td>First Name</td>
-          <td>N/A</td>
-        </tr>
-
-        <tr>
-          <td>last_name</td>
-          <td>VARCHAR</td>
-          <td>Last Name</td>
-          <td>N/A</td>
-        </tr>
-      </tbody>
-    </table>
-    <table class="table-constraints">
-      <thead>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Columns</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
-
-          <td rowspan="1" colspan="1">pk_users</td>
-          <td colspan="1">id</td>
-        </tr>
-
-        <tr>
-          <td rowspan="2" colspan="1">UniqueConstraint</td>
-
-          <td rowspan="1" colspan="1">uq_users_email</td>
-          <td colspan="1">email</td>
-        </tr>
-
-        <tr>
-          <td rowspan="1" colspan="1">uq_users_username</td>
-          <td colspan="1">username</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h1>user_roles</h1>
-    <p>
-      <b>Sqlalchemy Model:</b
-      ><a href="app/apis/v1/users/models/_UserRoles.py">UserRoles</a>
-    </p>
-    <div class="wrapper">
-      <h2>Description:</h2>
-      <p>holds user roles pairs</p>
+      <p>
+        <b>Sqlalchemy Model:</b
+        ><a href="app/apis/v1/users/models/_UserRoles.py"
+          >UserRoles</a
+        >
+      </p>
+      <div class="wrapper">
+        <h2>Description:</h2>
+        <p>holds user roles pairs</p>
+      </div>
+      
+      <table class="col-details">
+        <thead>
+          <th>Database Field Name</th>
+          <th>Data Type</th>
+          <th>Description</th>
+          <th>Primary/Foreign</th>
+        </thead>
+        <tbody>
+           
+          <tr>
+            <td>id</td>
+            <td>INTEGER</td>
+            <td>Unique row identifier</td>
+            <td>
+              Primary
+            </td>
+          </tr>
+          
+          <tr>
+            <td>user_id</td>
+            <td>INTEGER</td>
+            <td>user&#39;s table foreign key</td>
+            <td>
+              Foreign
+            </td>
+          </tr>
+          
+          <tr>
+            <td>role_id</td>
+            <td>INTEGER</td>
+            <td>role&#39;s table foreign key</td>
+            <td>
+              Foreign
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+      <table class="table-constraints">
+        <thead>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Columns</th>
+        </thead>
+        <tbody>
+           
+          <tr>
+            
+            <td rowspan="2" colspan="1">ForeignKeyConstraint</td>
+            
+            <td rowspan="1" colspan="1">
+              fk_user_roles_role_id_roles
+            </td>
+            <td colspan="1">role_id</td>
+          </tr>
+          
+          <tr>
+            
+            <td rowspan="1" colspan="1">
+              fk_user_roles_user_id_users
+            </td>
+            <td colspan="1">user_id</td>
+          </tr>
+            
+          <tr>
+            
+            <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
+            
+            <td rowspan="1" colspan="1">
+              pk_user_roles
+            </td>
+            <td colspan="1">id</td>
+          </tr>
+           
+        </tbody>
+      </table>
     </div>
-    <table class="col-details">
-      <thead>
-        <th>Database Field Name</th>
-        <th>Data Type</th>
-        <th>Description</th>
-        <th>Primary/Foreign</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td>id</td>
-          <td>INTEGER</td>
-          <td>Unique row identifier</td>
-          <td>Primary</td>
-        </tr>
-
-        <tr>
-          <td>user_id</td>
-          <td>INTEGER</td>
-          <td>user&#39;s table foreign key</td>
-          <td>Foreign</td>
-        </tr>
-
-        <tr>
-          <td>role_id</td>
-          <td>INTEGER</td>
-          <td>role&#39;s table foreign key</td>
-          <td>Foreign</td>
-        </tr>
-      </tbody>
-    </table>
-    <table class="table-constraints">
-      <thead>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Columns</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td rowspan="2" colspan="1">ForeignKeyConstraint</td>
-
-          <td rowspan="1" colspan="1">fk_user_roles_user_id_users</td>
-          <td colspan="1">user_id</td>
-        </tr>
-
-        <tr>
-          <td rowspan="1" colspan="1">fk_user_roles_role_id_roles</td>
-          <td colspan="1">role_id</td>
-        </tr>
-
-        <tr>
-          <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
-
-          <td rowspan="1" colspan="1">pk_user_roles</td>
-          <td colspan="1">id</td>
-        </tr>
-      </tbody>
-    </table>
+    
   </body>
 </html>

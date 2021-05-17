@@ -31,6 +31,18 @@ target_metadata = current_app.extensions["migrate"].db.metadata
 # ... etc.
 
 
+def include_object(object, name, type_, reflected, compare_to):
+    """
+    Exclude views from Alembic's consideration.
+    """
+    if (type_ == "table" and reflected and compare_to is None) or object.info.get(
+        "is_view", False
+    ):
+        return False
+    else:
+        return True
+
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
@@ -72,6 +84,7 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
+            include_object=include_object,
             connection=connection,
             target_metadata=target_metadata,
             process_revision_directives=process_revision_directives,
