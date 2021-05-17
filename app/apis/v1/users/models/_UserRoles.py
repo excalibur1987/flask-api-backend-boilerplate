@@ -1,9 +1,8 @@
 from typing import TYPE_CHECKING
 
+from app.database import BaseModel
 from sqlalchemy.sql.schema import Column, ForeignKeyConstraint
 from sqlalchemy.sql.sqltypes import INTEGER
-
-from app.database import BaseModel
 
 if TYPE_CHECKING:
     from app.apis.v1.roles.models._Role import Role
@@ -12,9 +11,11 @@ if TYPE_CHECKING:
 
 
 class UserRoles(BaseModel):
+    """holds user roles pairs"""
+
     __tablename__ = "user_roles"
-    user_id = Column(INTEGER, nullable=False)
-    role_id = Column(INTEGER, nullable=False)
+    user_id = Column(INTEGER, nullable=False, comment="user's table foreign key")
+    role_id = Column(INTEGER, nullable=False, comment="role's table foreign key")
 
     __table_args__ = (
         ForeignKeyConstraint(

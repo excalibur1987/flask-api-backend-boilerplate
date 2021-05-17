@@ -1,16 +1,15 @@
 import re
 from typing import TYPE_CHECKING, List, Union
 
+from app.database import BaseModel, db
+from app.exceptions import UserExceptions
+from app.utils.file_storage import FileStorage
 from flask import current_app
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import cast
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import BOOLEAN, String
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from app.database import BaseModel, db
-from app.exceptions import UserExceptions
-from app.utils.file_storage import FileStorage
 
 if TYPE_CHECKING:
     from ...roles.models import Role
@@ -33,27 +32,32 @@ class PasswordHelper:
 
 
 class User(BaseModel):
+    """Holds users' data"""
+
     __tablename__ = "users"
-    username = Column(String, nullable=False)
+    username = Column(String, nullable=False, unique=True, comment="User's identifier")
     active = Column(
-        "is_active", BOOLEAN(), nullable=False, server_default=cast(1, BOOLEAN)
+        "is_active",
+        BOOLEAN(),
+        nullable=False,
+        server_default=cast(1, BOOLEAN),
+        comment="Denotes active users",
     )
 
-    _password = Column("password", String, nullable=False, server_default="")
+    _password = Column("password", String, nullable=False, comment="Password hash")
 
     # User identifiers
-    email = Column(String, nullable=True)
+    email = Column(
+        String, nullable=True, unique=True, comment="User's personal unique email"
+    )
 
     # meta data
-    _photo = Column("photo", String, nullable=True)
-    mobile = Column(String, nullable=True)
+    _photo = Column("photo", String, nullable=True, comment="User's avatar url")
+    mobile = Column(String, nullable=True, comment="Contact number")
 
     # User information
-    first_name = Column(String, nullable=False, server_default="")
-    last_name = Column(String, nullable=False, server_default="")
-
-    first_name_ar = Column(String, nullable=False, server_default="")
-    last_name_ar = Column(String, nullable=False, server_default="")
+    first_name = Column(String, nullable=False, comment="First Name")
+    last_name = Column(String, nullable=False, server_default="", comment="Last Name")
 
     # Uncomment to if you want to add manager employee relations
     # manager_id = Column(String, nullable=True)
@@ -121,21 +125,22 @@ class User(BaseModel):
 
     @hybrid_property
     def password(self) -> PasswordHelper:
+        """password proxy helper"""
+
         return PasswordHelper(self._password)
 
     @hybrid_property
     def name(self) -> str:
+        """concatenates user's name"""
+
         return f"{self.first_name} {self.last_name}"
 
-    @hybrid_property
-    def name_ar(self) -> str:
-        return f"{self.first_name_ar} {self.last_name_ar}"
-
-    def check_password(self, pwd) -> bool:
-        valid_password: bool = check_password_hash(self.password, pwd)
-        return valid_password
-
     def add_roles(self, roles: Union[List["Role"], "Role"]):
+        """add roles to user
+
+        Args:
+            roles: A list of or a single role instances
+        """
         from ._UserRoles import UserRoles
 
         new_roles = [
@@ -146,5 +151,7 @@ class User(BaseModel):
         db.session.add_all(new_roles)
 
     def delete(self, persist=False):
+        """Delete user's record"""
+
         self.photo.delete()
         super().delete(persist=persist)
