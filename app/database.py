@@ -25,14 +25,13 @@ metadata = MetaData(
     }
 )
 
-
-db = SQLAlchemy(metadata=metadata)
-
 T = TypeVar("T")
 
 
 class ExtendedModel(Model):
-    id = Column(INTEGER, primary_key=True, nullable=False)
+    id = Column(
+        INTEGER, primary_key=True, nullable=False, comment="Unique row identifier"
+    )
 
     def update(self, ignore_none: bool = False, **kwargs):
         for key in kwargs.keys():
@@ -94,7 +93,7 @@ class ExtendedModel(Model):
             db.session.commit()
 
 
-db = SQLAlchemy(model_class=ExtendedModel)
+db = SQLAlchemy(model_class=ExtendedModel, metadata=metadata)
 
 
 if TYPE_CHECKING:

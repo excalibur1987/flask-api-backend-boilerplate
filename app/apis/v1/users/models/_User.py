@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING, Any, List, Union
 
 from app.database import BaseModel, db
 from app.exceptions import UserExceptions
@@ -111,13 +111,14 @@ class User(BaseModel):
         self.first_name_ar = first_name_ar
         self.last_name_ar = last_name_ar
 
-    def set_password(self, newpwd: str, pwdcheck: str):
-        regx = re.compile(current_app.config["PASSWORD_RULE"])
-        if newpwd is None:
-            return
-        if newpwd != pwdcheck or not regx.match(newpwd):
-            raise UserExceptions.password_check_invalid()
-        self.password = generate_password_hash(newpwd)
+    def __setattr__(self, name: str, value: Any) -> None:
+        """intercept setting of password"""
+        if name == "password":
+            regx = re.compile(current_app.config["PASSWORD_RULE"])
+            if not regx.match(value):
+                raise UserExceptions.password_check_invalid()
+            self._password = value
+        return super().__setattr__(name, value)
 
     @hybrid_property
     def photo(self) -> FileStorage:
@@ -126,13 +127,11 @@ class User(BaseModel):
     @hybrid_property
     def password(self) -> PasswordHelper:
         """password proxy helper"""
-
         return PasswordHelper(self._password)
 
     @hybrid_property
     def name(self) -> str:
         """concatenates user's name"""
-
         return f"{self.first_name} {self.last_name}"
 
     def add_roles(self, roles: Union[List["Role"], "Role"]):
@@ -152,6 +151,5 @@ class User(BaseModel):
 
     def delete(self, persist=False):
         """Delete user's record"""
-
         self.photo.delete()
         super().delete(persist=persist)

@@ -1,4 +1,6 @@
-from typing import Any, Callable, List, TypeVar
+from typing import Any, Callable, Dict, List, TypeVar
+
+from app.database import ExtendedModel
 
 T = TypeVar("T")
 
@@ -33,3 +35,20 @@ def argument_list_type(type_: T):
         return val
 
     return checker
+
+
+def get_model_constraints(model: ExtendedModel) -> Dict[str, List[Dict[str, str]]]:
+
+    result = {
+        clz.__name__: [
+            {"name": const.name, "columns": [col.name for col in const.columns]}
+            for const in model.__table__.constraints
+            if const.__class__ == clz
+        ]
+        for clz in sorted(
+            list(set(const.__class__ for const in model.__table__.constraints)),
+            key=lambda clz: clz.__name__,
+        )
+    }
+
+    return result

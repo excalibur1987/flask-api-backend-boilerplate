@@ -9,8 +9,13 @@ from typing import TYPE_CHECKING, List
 import click
 from flask import Flask, current_app
 from flask.cli import with_appcontext
+from flask.templating import render_template_string
+from flask_migrate import migrate as alembic_migrate
 from sqlalchemy.exc import DatabaseError
 from werkzeug.exceptions import MethodNotAllowed, NotFound
+
+from app.database import BaseModel
+from app.utils.helpers import get_model_constraints
 
 if TYPE_CHECKING:
     from app.apis.v1.users.models import User
@@ -254,6 +259,31 @@ def add_user():
         print("Error adding user")
 
 
+@click.command()
+@with_appcontext
+def migrate():
+    alembic_migrate()
+    with open(
+        os.path.join(os.getcwd(), "app", "utils", "data_dict_template.html"), "r"
+    ) as fp:
+        template = fp.read()
+    current_app.jinja_env.filters["get_constraints"] = get_model_constraints
+    current_app.jinja_env.filters["module_path"] = lambda attrs: os.path.join(
+        *(attrs[:-1] + [attrs[-1] + ".py"])
+    )
+    with current_app.app_context():
+        with open(os.path.join(os.getcwd(), "data_dict.html"), "w") as fp:
+            fp.write(
+                render_template_string(
+                    template,
+                    tables=sorted(
+                        list(BaseModel.__subclasses__()),
+                        key=lambda model: model.__name__,
+                    ),
+                )
+            )
+
+
 def register_commands(app: Flask) -> Flask:
     """Register Click commands."""
     app.cli.add_command(add_roles, "add-roles")
@@ -263,5 +293,6 @@ def register_commands(app: Flask) -> Flask:
     app.cli.add_command(lint)
     app.cli.add_command(test)
     app.cli.add_command(urls)
+    app.cli.add_command(migrate)
 
     return app
