@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      h1 {
+        text-decoration: underline;
+      }
+      table {
+        border-collapse: collapse;
+        margin: 1rem;
+      }
+      table * {
+        text-align: start;
+        border: 3px solid black;
+      }
+      table th {
+        padding: 0.5rem;
+        font-size: larger;
+        color: white;
+        background-color: #635e5e73;
+      }
+      b{
+        margin-right: 1rem;
+      }
+      tbody td{
+        padding: 0.5rem;
+      }
+    </style>
+    <title>Data Dictionary</title>
+  </head>
+  <body>
+    {% for table in tables %}
+    <h1>{{table.__tablename__}}</h1>
+    <p><b>Sqlalchemy Model:</b><a href="{{table.__module__.split('.')|module_path}}">{{table.__name__}}</a></p>
+    <div class="wrapper">
+      <h2>Description:</h2>
+      <p>{{table.__doc__}}</p>
+    </div>
+    <table class="col-details">
+      <thead>
+        <th>Database Field Name</th>
+        <th>Data Type</th>
+        <th>Description</th>
+        <th>Primary/Foreign</th>
+      </thead>
+      <tbody>
+        {% set constraints = table|get_constraints %} {% for col in
+        table.__table__.columns %}
+        <tr>
+          <td>{{col.name}}</td>
+          <td>{{col.type}}</td>
+          <td>{{col.comment}}</td>
+          <td>
+            {{'Primary' if col.primary_key else 'Foreign' if (col.foreign_keys or [])|length > 0
+            else 'N/A'}}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <table class="table-constraints">
+      <thead>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Columns</th>
+      </thead>
+      <tbody>
+        {% for type_, values in constraints.items()%}
+          {% for const in values %}
+            <tr>
+              {% if loop.index == 1 %}
+              <td rowspan="{{values|length}}" colspan="1">{{type_}}</td>
+              {% endif %}
+              <td rowspan="{{const.columns|length}}" colspan="1">{{const.name}}</td>
+              <td colspan="1">{{''.join(const.columns)}}</td>
+            </tr>
+          {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endfor %}
+  </body>
+</html>
