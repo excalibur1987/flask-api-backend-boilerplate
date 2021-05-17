@@ -61,7 +61,7 @@ class ExtendedModel(Model):
                         getattr(cls, arg) == val
                         for arg, val in kwargs.items()
                         if hasattr(cls, arg)
-                    ]
+                    ],
                 )
             )
             .one_or_none()
@@ -94,6 +94,28 @@ class ExtendedModel(Model):
 
 
 db = SQLAlchemy(model_class=ExtendedModel, metadata=metadata)
+
+
+class ViewModel(object):
+    __table_args__ = {"info": dict(is_view=True)}
+    is_view = True
+
+    @classmethod
+    def get_ddl(cls):
+        sql = "select pg_get_viewdef(to_regclass(:view))"
+        return (
+            "CREATE OR REPLACE VIEW public.v_user_view\nAS "
+            + f"{db.session.execute(sql, params={'view':cls.__tablename__}).scalar()}"
+        )
+
+    def delete(self):
+        raise NotImplementedError
+
+    def update(self):
+        raise NotImplementedError
+
+    def save(self):
+        raise NotImplementedError
 
 
 if TYPE_CHECKING:
