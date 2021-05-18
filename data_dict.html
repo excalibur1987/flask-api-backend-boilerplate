@@ -9,7 +9,7 @@
         padding: 0 2rem;
         border: 1px ridge #000;
       }
-      h1.title{
+      h1.title {
         margin: auto;
         width: 50%;
       }
@@ -59,15 +59,15 @@
   <body>
     <h1 class="title">Data Dictionary</h1>
     
-    <div class="sql-table-contianer">
+    <div class="sql-table-contianer" data-model="Role" >
       <h2>
-        roles
-        <sub>Table</sub>
+        <span class="table-name">roles</span>
+        <sub>TABLE</sub>
       </h2>
 
       <p>
         <b>Sqlalchemy Model:</b
-        ><a href="app/apis/v1/roles/models/_Role.py"
+        ><a href=""
           >Role</a
         >
       </p>
@@ -84,13 +84,13 @@
           <th>Primary/Foreign</th>
         </thead>
         <tbody>
-           
+          
           <tr>
             <td>id</td>
             <td>INTEGER</td>
             <td>Unique row identifier</td>
             <td>
-              Primary
+              primary
             </td>
           </tr>
           
@@ -99,7 +99,7 @@
             <td>VARCHAR</td>
             <td>None</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -108,7 +108,7 @@
             <td>VARCHAR</td>
             <td>None</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -121,30 +121,30 @@
           <th>Columns</th>
         </thead>
         <tbody>
-           
-          <tr>
-            
-            <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
-            
-            <td rowspan="1" colspan="1">
-              pk_roles
-            </td>
-            <td colspan="1">id</td>
-          </tr>
+             
+              <tr>
+                
+                <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
+                
+                <td rowspan="1" colspan="1">
+                  pk_roles
+                </td>
+                <td colspan="1">id</td>
+              </tr>
            
         </tbody>
       </table>
     </div>
     
-    <div class="sql-table-contianer">
+    <div class="sql-table-contianer" data-model="Session" >
       <h2>
-        sessions
-        <sub>Table</sub>
+        <span class="table-name">sessions</span>
+        <sub>TABLE</sub>
       </h2>
 
       <p>
         <b>Sqlalchemy Model:</b
-        ><a href="app/apis/v1/users/models/_Session.py"
+        ><a href=""
           >Session</a
         >
       </p>
@@ -161,13 +161,13 @@
           <th>Primary/Foreign</th>
         </thead>
         <tbody>
-           
+          
           <tr>
             <td>id</td>
             <td>INTEGER</td>
             <td>Unique row identifier</td>
             <td>
-              Primary
+              primary
             </td>
           </tr>
           
@@ -176,7 +176,7 @@
             <td>INTEGER</td>
             <td>user&#39;s table foreign key</td>
             <td>
-              Foreign
+              foreign
             </td>
           </tr>
           
@@ -185,7 +185,7 @@
             <td>VARCHAR</td>
             <td>session&#39;s token</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -194,7 +194,7 @@
             <td>VARCHAR</td>
             <td>machine&#39;s ip address</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -203,7 +203,7 @@
             <td>VARCHAR</td>
             <td>machine&#39;s os platform</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -212,7 +212,7 @@
             <td>VARCHAR</td>
             <td>registered browser</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -221,7 +221,7 @@
             <td>BOOLEAN</td>
             <td>None</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -230,7 +230,7 @@
             <td>VARCHAR</td>
             <td>unique&#39;s slug identifier</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -239,7 +239,7 @@
             <td>TIMESTAMP</td>
             <td>session&#39;s creation date</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -252,50 +252,50 @@
           <th>Columns</th>
         </thead>
         <tbody>
-           
-          <tr>
+             
+              <tr>
+                
+                <td rowspan="1" colspan="1">ForeignKeyConstraint</td>
+                
+                <td rowspan="1" colspan="1">
+                  fk_sessions_user_id_users
+                </td>
+                <td colspan="1">user_id</td>
+              </tr>
             
-            <td rowspan="1" colspan="1">ForeignKeyConstraint</td>
+              <tr>
+                
+                <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
+                
+                <td rowspan="1" colspan="1">
+                  pk_sessions
+                </td>
+                <td colspan="1">id</td>
+              </tr>
             
-            <td rowspan="1" colspan="1">
-              fk_sessions_user_id_users
-            </td>
-            <td colspan="1">user_id</td>
-          </tr>
-            
-          <tr>
-            
-            <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
-            
-            <td rowspan="1" colspan="1">
-              pk_sessions
-            </td>
-            <td colspan="1">id</td>
-          </tr>
-            
-          <tr>
-            
-            <td rowspan="1" colspan="1">UniqueConstraint</td>
-            
-            <td rowspan="1" colspan="1">
-              uq_sessions_slug
-            </td>
-            <td colspan="1">slug</td>
-          </tr>
+              <tr>
+                
+                <td rowspan="1" colspan="1">UniqueConstraint</td>
+                
+                <td rowspan="1" colspan="1">
+                  uq_sessions_slug
+                </td>
+                <td colspan="1">slug</td>
+              </tr>
            
         </tbody>
       </table>
     </div>
     
-    <div class="sql-table-contianer">
+    <div class="sql-table-contianer" data-model="User" >
       <h2>
-        users
-        <sub>Table</sub>
+        <span class="table-name">users</span>
+        <sub>TABLE</sub>
       </h2>
 
       <p>
         <b>Sqlalchemy Model:</b
-        ><a href="app/apis/v1/users/models/_User.py"
+        ><a href=""
           >User</a
         >
       </p>
@@ -312,13 +312,13 @@
           <th>Primary/Foreign</th>
         </thead>
         <tbody>
-           
+          
           <tr>
             <td>id</td>
             <td>INTEGER</td>
             <td>Unique row identifier</td>
             <td>
-              Primary
+              primary
             </td>
           </tr>
           
@@ -327,7 +327,7 @@
             <td>VARCHAR</td>
             <td>User&#39;s identifier</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -336,7 +336,7 @@
             <td>BOOLEAN</td>
             <td>Denotes active users</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -345,7 +345,7 @@
             <td>VARCHAR</td>
             <td>Password hash</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -354,7 +354,7 @@
             <td>VARCHAR</td>
             <td>User&#39;s personal unique email</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -363,7 +363,7 @@
             <td>VARCHAR</td>
             <td>User&#39;s avatar url</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -372,7 +372,7 @@
             <td>VARCHAR</td>
             <td>Contact number</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -381,7 +381,7 @@
             <td>VARCHAR</td>
             <td>First Name</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -390,7 +390,7 @@
             <td>VARCHAR</td>
             <td>Last Name</td>
             <td>
-              N/A
+              n/a
             </td>
           </tr>
           
@@ -403,48 +403,48 @@
           <th>Columns</th>
         </thead>
         <tbody>
-           
-          <tr>
+             
+              <tr>
+                
+                <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
+                
+                <td rowspan="1" colspan="1">
+                  pk_users
+                </td>
+                <td colspan="1">id</td>
+              </tr>
             
-            <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
-            
-            <td rowspan="1" colspan="1">
-              pk_users
-            </td>
-            <td colspan="1">id</td>
-          </tr>
-            
-          <tr>
-            
-            <td rowspan="2" colspan="1">UniqueConstraint</td>
-            
-            <td rowspan="1" colspan="1">
-              uq_users_email
-            </td>
-            <td colspan="1">email</td>
-          </tr>
+              <tr>
+                
+                <td rowspan="2" colspan="1">UniqueConstraint</td>
+                
+                <td rowspan="1" colspan="1">
+                  uq_users_username
+                </td>
+                <td colspan="1">username</td>
+              </tr>
           
-          <tr>
-            
-            <td rowspan="1" colspan="1">
-              uq_users_username
-            </td>
-            <td colspan="1">username</td>
-          </tr>
+              <tr>
+                
+                <td rowspan="1" colspan="1">
+                  uq_users_email
+                </td>
+                <td colspan="1">email</td>
+              </tr>
            
         </tbody>
       </table>
     </div>
     
-    <div class="sql-table-contianer">
+    <div class="sql-table-contianer" data-model="UserRoles" >
       <h2>
-        user_roles
-        <sub>Table</sub>
+        <span class="table-name">user_roles</span>
+        <sub>TABLE</sub>
       </h2>
 
       <p>
         <b>Sqlalchemy Model:</b
-        ><a href="app/apis/v1/users/models/_UserRoles.py"
+        ><a href=""
           >UserRoles</a
         >
       </p>
@@ -461,13 +461,13 @@
           <th>Primary/Foreign</th>
         </thead>
         <tbody>
-           
+          
           <tr>
             <td>id</td>
             <td>INTEGER</td>
             <td>Unique row identifier</td>
             <td>
-              Primary
+              primary
             </td>
           </tr>
           
@@ -476,7 +476,7 @@
             <td>INTEGER</td>
             <td>user&#39;s table foreign key</td>
             <td>
-              Foreign
+              foreign
             </td>
           </tr>
           
@@ -485,7 +485,7 @@
             <td>INTEGER</td>
             <td>role&#39;s table foreign key</td>
             <td>
-              Foreign
+              foreign
             </td>
           </tr>
           
@@ -498,34 +498,34 @@
           <th>Columns</th>
         </thead>
         <tbody>
-           
-          <tr>
-            
-            <td rowspan="2" colspan="1">ForeignKeyConstraint</td>
-            
-            <td rowspan="1" colspan="1">
-              fk_user_roles_role_id_roles
-            </td>
-            <td colspan="1">role_id</td>
-          </tr>
+             
+              <tr>
+                
+                <td rowspan="2" colspan="1">ForeignKeyConstraint</td>
+                
+                <td rowspan="1" colspan="1">
+                  fk_user_roles_user_id_users
+                </td>
+                <td colspan="1">user_id</td>
+              </tr>
           
-          <tr>
+              <tr>
+                
+                <td rowspan="1" colspan="1">
+                  fk_user_roles_role_id_roles
+                </td>
+                <td colspan="1">role_id</td>
+              </tr>
             
-            <td rowspan="1" colspan="1">
-              fk_user_roles_user_id_users
-            </td>
-            <td colspan="1">user_id</td>
-          </tr>
-            
-          <tr>
-            
-            <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
-            
-            <td rowspan="1" colspan="1">
-              pk_user_roles
-            </td>
-            <td colspan="1">id</td>
-          </tr>
+              <tr>
+                
+                <td rowspan="1" colspan="1">PrimaryKeyConstraint</td>
+                
+                <td rowspan="1" colspan="1">
+                  pk_user_roles
+                </td>
+                <td colspan="1">id</td>
+              </tr>
            
         </tbody>
       </table>

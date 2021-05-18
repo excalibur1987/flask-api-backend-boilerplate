@@ -1,0 +1,264 @@
+{
+  "roles": {
+    "type": "table",
+    "model": {
+      "name": "Role",
+      "path": "app/apis/v1/roles/models/_Role.py"
+    },
+    "description": null,
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "comment": "Unique row identifier",
+        "primary/foreign": "primary"
+      },
+      {
+        "name": "name",
+        "type": "VARCHAR",
+        "comment": null,
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "description",
+        "type": "VARCHAR",
+        "comment": null,
+        "primary/foreign": "n/a"
+      }
+    ],
+    "constraints": [
+      {
+        "name": "pk_roles",
+        "type": "PrimaryKeyConstraint",
+        "columns": [
+          "id"
+        ]
+      }
+    ]
+  },
+  "sessions": {
+    "type": "table",
+    "model": {
+      "name": "Session",
+      "path": "app/apis/v1/users/models/_Session.py"
+    },
+    "description": "table for user's active sessions",
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "comment": "Unique row identifier",
+        "primary/foreign": "primary"
+      },
+      {
+        "name": "user_id",
+        "type": "INTEGER",
+        "comment": "user's table foreign key",
+        "primary/foreign": "foreign"
+      },
+      {
+        "name": "token",
+        "type": "VARCHAR",
+        "comment": "session's token",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "ip_address",
+        "type": "VARCHAR",
+        "comment": "machine's ip address",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "platform",
+        "type": "VARCHAR",
+        "comment": "machine's os platform",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "browser",
+        "type": "VARCHAR",
+        "comment": "registered browser",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "active",
+        "type": "BOOLEAN",
+        "comment": null,
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "slug",
+        "type": "VARCHAR",
+        "comment": "unique's slug identifier",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "created_at",
+        "type": "TIMESTAMP",
+        "comment": "session's creation date",
+        "primary/foreign": "n/a"
+      }
+    ],
+    "constraints": [
+      {
+        "name": "fk_sessions_user_id_users",
+        "type": "ForeignKeyConstraint",
+        "columns": [
+          "user_id"
+        ]
+      },
+      {
+        "name": "pk_sessions",
+        "type": "PrimaryKeyConstraint",
+        "columns": [
+          "id"
+        ]
+      },
+      {
+        "name": "uq_sessions_slug",
+        "type": "UniqueConstraint",
+        "columns": [
+          "slug"
+        ]
+      }
+    ]
+  },
+  "users": {
+    "type": "table",
+    "model": {
+      "name": "User",
+      "path": "app/apis/v1/users/models/_User.py"
+    },
+    "description": "Holds users' data",
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "comment": "Unique row identifier",
+        "primary/foreign": "primary"
+      },
+      {
+        "name": "username",
+        "type": "VARCHAR",
+        "comment": "User's identifier",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "is_active",
+        "type": "BOOLEAN",
+        "comment": "Denotes active users",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "password",
+        "type": "VARCHAR",
+        "comment": "Password hash",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "email",
+        "type": "VARCHAR",
+        "comment": "User's personal unique email",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "photo",
+        "type": "VARCHAR",
+        "comment": "User's avatar url",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "mobile",
+        "type": "VARCHAR",
+        "comment": "Contact number",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "first_name",
+        "type": "VARCHAR",
+        "comment": "First Name",
+        "primary/foreign": "n/a"
+      },
+      {
+        "name": "last_name",
+        "type": "VARCHAR",
+        "comment": "Last Name",
+        "primary/foreign": "n/a"
+      }
+    ],
+    "constraints": [
+      {
+        "name": "pk_users",
+        "type": "PrimaryKeyConstraint",
+        "columns": [
+          "id"
+        ]
+      },
+      {
+        "name": "uq_users_username",
+        "type": "UniqueConstraint",
+        "columns": [
+          "username"
+        ]
+      },
+      {
+        "name": "uq_users_email",
+        "type": "UniqueConstraint",
+        "columns": [
+          "email"
+        ]
+      }
+    ]
+  },
+  "user_roles": {
+    "type": "table",
+    "model": {
+      "name": "UserRoles",
+      "path": "app/apis/v1/users/models/_UserRoles.py"
+    },
+    "description": "holds user roles pairs",
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "comment": "Unique row identifier",
+        "primary/foreign": "primary"
+      },
+      {
+        "name": "user_id",
+        "type": "INTEGER",
+        "comment": "user's table foreign key",
+        "primary/foreign": "foreign"
+      },
+      {
+        "name": "role_id",
+        "type": "INTEGER",
+        "comment": "role's table foreign key",
+        "primary/foreign": "foreign"
+      }
+    ],
+    "constraints": [
+      {
+        "name": "fk_user_roles_user_id_users",
+        "type": "ForeignKeyConstraint",
+        "columns": [
+          "user_id"
+        ]
+      },
+      {
+        "name": "fk_user_roles_role_id_roles",
+        "type": "ForeignKeyConstraint",
+        "columns": [
+          "role_id"
+        ]
+      },
+      {
+        "name": "pk_user_roles",
+        "type": "PrimaryKeyConstraint",
+        "columns": [
+          "id"
+        ]
+      }
+    ]
+  }
+}

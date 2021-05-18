@@ -30,8 +30,8 @@ class UserRoles(BaseModel):
         ),
     )
 
-    def __init__(
-        self, user: "User" = None, role: "Role" = None, user_id: int = None
-    ) -> None:
-        self.user_id = user_id or user.id
+    def __init__(self, role: "Role", user: "User" = None, user_id: int = None) -> None:
+        id_ = user.id if user is not None else user_id
+        assert id_ is not None
+        self.user_id = id_
         self.role_id = role.id

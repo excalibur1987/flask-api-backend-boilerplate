@@ -1,7 +1,8 @@
 import pytest
 from app.exceptions import InvalidUsage
+from app.utils import g
 from app.utils.decorators import check_roles, has_roles
-from flask import Flask, g
+from flask import Flask
 from flask_principal import Identity, Permission, RoleNeed
 
 
