@@ -1,10 +1,9 @@
 from functools import wraps
-from typing import Callable, List, Union
-
-from flask import g
-from flask_principal import Identity, Permission, RoleNeed
+from typing import Callable, Iterable, List, Union
 
 from app.exceptions import InvalidUsage
+from flask import g
+from flask_principal import Identity, Permission, RoleNeed
 
 
 def check_roles(
@@ -24,7 +23,7 @@ def check_roles(
     return allowed_roles > 0 and (allowed_roles == len(roles) or optional)
 
 
-def has_roles(*args: List[str]):
+def has_roles(*args: Iterable[str]):
     roles = [
         (
             Permission(RoleNeed(role))

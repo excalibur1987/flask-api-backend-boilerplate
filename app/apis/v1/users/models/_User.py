@@ -13,7 +13,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 if TYPE_CHECKING:
     from ...roles.models import Role
-    from ._Session import Session
+    from ._Session import Session  # NOQA
 
     hybrid_property = property
 else:
@@ -27,6 +27,7 @@ class PasswordHelper:
         self.password = password
 
     def __eq__(self, o: object) -> bool:
+        assert isinstance(o, str)
         equality: bool = check_password_hash(self.password, o)
         return equality
 
@@ -75,9 +76,9 @@ class User(BaseModel):
     # Relationships
 
     # Define the relationship to Role via UserRoles
-    roles: List["Role"] = relationship("Role", secondary="user_roles")
+    roles = relationship("Role", secondary="user_roles")
     # user sessions
-    sessions: List["Session"] = relationship(
+    sessions = relationship(
         "Session", order_by="Session.created_at.asc()", uselist=True
     )
 

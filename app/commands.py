@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Click commands."""
+import json
 import os
 import re
 from getpass import getpass
@@ -14,8 +15,7 @@ from flask_migrate import migrate as alembic_migrate
 from sqlalchemy.exc import DatabaseError
 from werkzeug.exceptions import MethodNotAllowed, NotFound
 
-from app.database import BaseModel
-from app.utils.helpers import get_model_constraints
+from app.utils.helpers import generate_op, get_tables_data
 
 if TYPE_CHECKING:
     from app.apis.v1.users.models import User
@@ -262,26 +262,89 @@ def add_user():
 @click.command()
 @with_appcontext
 def migrate():
-    alembic_migrate()
     with open(
         os.path.join(os.getcwd(), "app", "utils", "data_dict_template.html"), "r"
     ) as fp:
         template = fp.read()
-    current_app.jinja_env.filters["get_constraints"] = get_model_constraints
-    current_app.jinja_env.filters["module_path"] = lambda attrs: os.path.join(
-        *(attrs[:-1] + [attrs[-1] + ".py"])
-    )
-    with current_app.app_context():
-        with open(os.path.join(os.getcwd(), "data_dict.html"), "w") as fp:
-            fp.write(
-                render_template_string(
-                    template,
-                    tables=sorted(
-                        list(BaseModel.__subclasses__()),
-                        key=lambda model: model.__name__,
-                    ),
-                )
+    tables_data = get_tables_data()
+
+    with open(os.path.join(os.getcwd(), "data_dict.json"), "r") as fp:
+        old_data = json.loads(fp.read())
+
+    if json.dumps(old_data) == json.dumps(tables_data):
+        print("No Schema changes detected")
+        return
+
+    alembic_migrate()
+
+    drop_ddl = "DROP VIEW IF EXISTS {};"
+
+    def format_ddl(ddl: str) -> str:
+
+        return "\n\t\t".join([line.strip() for line in ddl.splitlines()])
+
+    changed_views = [
+        {
+            "new_ddl": format_ddl(
+                tables_data.get(name, {}).get("ddl", drop_ddl.format(name))
+            ),
+            "old_ddl": format_ddl(
+                old_data.get(name, {}).get("ddl", drop_ddl.format(name))
+            ),
+        }
+        for name in set(
+            [
+                name
+                for name, details in {**tables_data, **old_data}.items()
+                if details["type"] == "view"
+            ]
+        )
+        if tables_data.get(name, {}).get("ddl") != old_data.get(name, {}).get("ddl")
+    ]
+    generate_op(changed_views)
+
+    with open(os.path.join(os.getcwd(), "data_dict.json"), "w") as fp:
+        fp.write(
+            json.dumps(
+                tables_data,
+                indent=2,
             )
+        )
+    with open(os.path.join(os.getcwd(), "data_dict.html"), "w") as fp:
+        fp.write(
+            render_template_string(
+                template,
+                tables=dict(
+                    (
+                        table,
+                        {
+                            **table_details,
+                            **{
+                                "constraints": dict(
+                                    (
+                                        constrain_type,
+                                        [
+                                            constrain
+                                            for constrain in table_details[
+                                                "constraints"
+                                            ]
+                                            if constrain["type"] == constrain_type
+                                        ],
+                                    )
+                                    for constrain_type in sorted(
+                                        set(
+                                            const["type"]
+                                            for const in table_details["constraints"]
+                                        )
+                                    )
+                                )
+                            },
+                        },
+                    )
+                    for table, table_details in tables_data.items()
+                ),
+            )
+        )
 
 
 def register_commands(app: Flask) -> Flask:

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Type, TypeVar
+from typing import TYPE_CHECKING, Type, TypeVar, Union
 
 from flask.globals import current_app
 from flask_jwt_extended import current_user
@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.sql.expression import cast, or_
-from sqlalchemy.sql.schema import ForeignKey, MetaData
+from sqlalchemy.sql.schema import ForeignKey, MetaData, Table
 from sqlalchemy.sql.sqltypes import BOOLEAN, INTEGER, Boolean, DateTime, String
 
 from app.exceptions import InvalidUsage
@@ -29,9 +29,12 @@ T = TypeVar("T")
 
 
 class ExtendedModel(Model):
+    __table__: Table
+    __tablename__: str
     id = Column(
         INTEGER, primary_key=True, nullable=False, comment="Unique row identifier"
     )
+    updated_at: "Column[datetime]"
 
     def update(self, ignore_none: bool = False, **kwargs):
         for key in kwargs.keys():
@@ -42,7 +45,7 @@ class ExtendedModel(Model):
         db.session.commit()
 
     @classmethod
-    def get(cls: T, id: int = None, **kwargs) -> T:
+    def get(cls: T, id: int = None, **kwargs) -> Union[T, None]:
         """Gets class instance using id or named attributes
         Args:
             id (int, optional): User id.
@@ -56,7 +59,7 @@ class ExtendedModel(Model):
             db.session.query(cls)
             .filter(
                 and_(
-                    or_(cls.id == id, id == None),
+                    or_(getattr(cls, "id") == id, id == None),
                     *[
                         getattr(cls, arg) == val
                         for arg, val in kwargs.items()
@@ -104,7 +107,7 @@ class ViewModel(object):
     def get_ddl(cls):
         sql = "select pg_get_viewdef(to_regclass(:view))"
         return (
-            "CREATE OR REPLACE VIEW public.v_user_view\nAS "
+            "CREATE OR REPLACE VIEW public.v_user_view\nAS\n"
             + f"{db.session.execute(sql, params={'view':cls.__tablename__}).scalar()}"
         )
 

@@ -58,27 +58,27 @@
   </head>
   <body>
     <h1 class="title">Data Dictionary</h1>
-    {% for table in tables %}
-    <div class="sql-table-contianer">
+    {% for table, table_details in tables.items() %}
+    <div class="sql-table-contianer" data-model="{{table_details.model.name}}" {% if table_details.type == 'view' %}data-view=""{%endif%}>
       <h2>
-        {{table.__tablename__}}
-        <sub>{% if (table.is_view or False) %}View{%else%}Table{%endif%}</sub>
+        <span class="table-name">{{table}}</span>
+        <sub>{{table_details.type.upper()}}</sub>
       </h2>
 
       <p>
         <b>Sqlalchemy Model:</b
-        ><a href="{{table.__module__.split('.')|module_path}}"
-          >{{table.__name__}}</a
+        ><a href="{{table_details.path}}"
+          >{{table_details.model.name}}</a
         >
       </p>
       <div class="wrapper">
         <h2>Description:</h2>
-        <p>{{table.__doc__}}</p>
+        <p>{{table_details.description}}</p>
       </div>
-      {% if (table.is_view or False) %}
+      {% if table_details.type == 'view' %}
       <div class="wrapper">
         <h2>DDL:</h2>
-        <pre>{{table.get_ddl()}}</pre>
+        <pre>{{table_details.ddl}}</pre>
       </div>
       {% endif %}
       <table class="col-details">
@@ -89,15 +89,14 @@
           <th>Primary/Foreign</th>
         </thead>
         <tbody>
-          {% set constraints = table|get_constraints %} {% for col in
-          table.__table__.columns %}
+          {% for col in
+            table_details.columns %}
           <tr>
             <td>{{col.name}}</td>
             <td>{{col.type}}</td>
             <td>{{col.comment}}</td>
             <td>
-              {{'Primary' if col.primary_key else 'Foreign' if (col.foreign_keys
-              or [])|length > 0 else 'N/A'}}
+              {{col['primary/foreign']}}
             </td>
           </tr>
           {% endfor %}
@@ -110,17 +109,17 @@
           <th>Columns</th>
         </thead>
         <tbody>
-          {% for type_, values in constraints.items()%} {% for const in values
-          %}
-          <tr>
-            {% if loop.index == 1 %}
-            <td rowspan="{{values|length}}" colspan="1">{{type_}}</td>
-            {% endif %}
-            <td rowspan="{{const.columns|length}}" colspan="1">
-              {{const.name}}
-            </td>
-            <td colspan="1">{{''.join(const.columns)}}</td>
-          </tr>
+            {% for type_, values in table_details.constraints.items()%} {% for const in values
+              %}
+              <tr>
+                {% if loop.index == 1 %}
+                <td rowspan="{{values|length}}" colspan="1">{{type_}}</td>
+                {% endif %}
+                <td rowspan="{{const.columns|length}}" colspan="1">
+                  {{const.name}}
+                </td>
+                <td colspan="1">{{''.join(const.columns)}}</td>
+              </tr>
           {% endfor %} {% endfor %}
         </tbody>
       </table>
