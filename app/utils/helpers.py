@@ -13,12 +13,40 @@ from typing import (
     TypeVar,
 )
 
+import flask.helpers
+import flask.scaffold
 from app.database import BaseModel, ExtendedModel, db
+from flask.blueprints import Blueprint
 from flask_migrate import revision
 
 T = TypeVar("T")
 
 X = TypeVar("X")
+
+
+def create_api(
+    bp: Blueprint,
+    version: str,
+    title: str,
+    authorizations: dict = None,
+    security: str = None,
+):
+    """helper function to create Flask_restx Api instance and register it to a flask or a blueprint instance"""
+
+    # Monkey batch to solve the following issue
+    # https://github.com/flask-restful/flask-restful/pull/913
+    flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func  # type: ignore
+    from flask_restx import Api
+
+    api = Api(
+        bp,
+        version=version,
+        title=title,
+        authorizations=authorizations,
+        security=security,
+    )
+
+    return api
 
 
 def chain(*functions: Callable[[T], T]) -> Callable[[T], T]:

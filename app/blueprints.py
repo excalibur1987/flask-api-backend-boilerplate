@@ -1,4 +1,3 @@
-import flask
 from flask import Flask
 
 
@@ -15,9 +14,6 @@ def register_blueprints(app: "Flask") -> "Flask":
         Flask: Flask Application instance
     """
 
-    # Monkey batch to solve this issue
-    # https://github.com/flask-restful/flask-restful/pull/913
-    flask.helpers._endpoint_from_view_func = flask.scaffold._endpoint_from_view_func
     from app.apis.v1 import api_v1_bp
 
     app.register_blueprint(api_v1_bp)

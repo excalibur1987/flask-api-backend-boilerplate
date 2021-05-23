@@ -1,11 +1,13 @@
+from app.utils.helpers import create_api
 from flask import Blueprint
-from flask_restx import Api
 
 from .roles import api as roles_api
 from .users import api as user_api
 
 api_v1_bp = Blueprint("v1", __name__, url_prefix="/v1")
-api_v1 = Api(
+
+
+api_v1 = create_api(
     api_v1_bp,
     version="1",
     title="Backend Api",
