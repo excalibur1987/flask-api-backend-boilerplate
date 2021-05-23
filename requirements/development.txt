@@ -1,12 +1,11 @@
 -r "production.txt"
 
-flake8
-black
-isort
-pytest
-sqlalchemy-stubs
-python-dotenv
-git+https://github.com/ssfdust/flask-sqlalchemy-stubs.git
-pre-commit
-boto3-stubs
-pytest-cov
+flake8==3.9.2
+black==21.5b1
+isort==5.8.0
+pytest==6.2.4
+sqlalchemy2-stubs==0.0.2a1
+python-dotenv==0.17.1
+pre-commit==2.13.0
+boto3-stubs==1.17.78
+pytest-cov==2.12.0
