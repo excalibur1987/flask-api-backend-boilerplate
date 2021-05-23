@@ -5,7 +5,7 @@
       "name": "Role",
       "path": "app/apis/v1/roles/models/_Role.py"
     },
-    "description": null,
+    "description": "contains basic roles for the aplication",
     "columns": [
       {
         "name": "id",

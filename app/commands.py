@@ -180,18 +180,15 @@ def add_user_helper() -> "User":
 
     first_name = input("First Name:").title()
     last_name = input("Last Name:").title()
-    first_name_ar = input("First Name Ar:")
-    last_name_ar = input("Last Name Ar:")
 
     return User(
         username=username,
         password=password,
+        password_check=password_check,
         email=email,
         mobile=mobile,
         first_name=first_name,
         last_name=last_name,
-        first_name_ar=first_name_ar,
-        last_name_ar=last_name_ar,
     )
 
 
@@ -204,7 +201,13 @@ def add_roles(roles: List[str]):
     from app.database import db
 
     try:
-        db.session.add_all([Role(role) for role in roles if not Role.get(name=role)])
+        db.session.add_all(
+            [
+                Role(role, description=f"{role.title()} role")
+                for role in roles
+                if not Role.get(name=role)
+            ]
+        )
         db.session.commit()
     except DatabaseError:
         print("Error adding roles")
@@ -218,7 +221,7 @@ def add_superuser():
     from app.database import db
 
     try:
-        admin_role = Role.get(name="admin") or Role("admin")
+        admin_role = Role.get(name="admin") or Role("admin", "Admin Role")
         if not admin_role.id:
             db.session.add(admin_role)
             db.session.flush()

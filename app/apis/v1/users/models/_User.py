@@ -95,8 +95,6 @@ class User(BaseModel):
         mobile: str = None,
         first_name: str = "",
         last_name: str = "",
-        first_name_ar: str = "",
-        last_name_ar: str = "",
         **kwargs,
     ) -> None:
         if password != password_check:
@@ -109,8 +107,6 @@ class User(BaseModel):
         self.mobile = mobile
         self.first_name = first_name
         self.last_name = last_name
-        self.first_name_ar = first_name_ar
-        self.last_name_ar = last_name_ar
 
     def __setattr__(self, name: str, value: Any) -> None:
         """intercept setting of password"""
